@@ -1,0 +1,43 @@
+#!/bin/ksh
+
+function usage {
+  cat <<EOF
+
+snap options: 
+
+  -s force snap to use snapshots.
+  -f force snap to use ftp sources ( http is default ).
+  -a <arch> use <arch> instead of what is 'arch' returns.
+  -m <machine> use <machine> instead of what 'machine -s' returns.
+  -v <version> used to force snap to use <version> ( example: 5.2 ).
+  -p if set snap will use bsd regardless of being on a multi processor system.
+  -x do not extract x11 sets.
+  -w write all options to ~/.snaprc for less optionie usage later
+
+  -R specify a region to determine fastest mirror from.
+  -M finds the fastest mirror ( if no region is specified with -R, all regions 
+    are checked. This option will write to ~/.snaprc.
+
+  -h ( help )
+
+  Examples: 
+    To update to the latest snapshot using the fastest mirror for your
+    region:
+
+      snap -s -R USA -M 
+
+    Next time you want to do the same, the mirror will already be in
+    ~/.snaprc so running the below will have the same effect:
+
+      snap -s
+
+EOF
+  exit 0
+}
+
+while getopts "sfa:sm:sv:spxR:sAM:sh" arg; do
+  if [ $arg == "h" ]; then
+    usage
+  fi
+  echo $arg $OPTARG
+done
