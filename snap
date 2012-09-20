@@ -1,30 +1,46 @@
 #!/bin/ksh
 
+grey="\033[01;30m"
+red="\033[01;31m"
+green="\033[01;32m"
+yellow="\033[01;33m"
+blue="\033[01;34m"
+magenta="\033[01;35m"
+cyan="\033[01;35m"
+bold="\033[01;39m"
+
+white="\033[0m"
+
+set -A sets 'comp' 'game' 'man' 'etc' 'base'
+set -A xsets 'xbase' 'xserv' 'xshare' 'xetc'
+
 function usage {
   cat <<EOF
 
 snap options: 
 
   -s force snap to use snapshots.
+  -c specify location of config file ( default is ~/.snaprc )
   -f force snap to use ftp sources ( http is default ).
   -a <arch> use <arch> instead of what is 'arch' returns.
   -m <machine> use <machine> instead of what 'machine -s' returns.
-  -v <version> used to force snap to use <version> ( example: 5.2 ).
-  -p if set snap will use bsd regardless of being on a multi processor system.
+  -v <version> used to force snap to use <version> ( example: snapshots ).
+  -V <setversion> used to force snap to use <setversion> for sets ( example: 52 ).
   -x do not extract x11 sets.
   -w write all options to ~/.snaprc for less optionie usage later
 
-  -R specify a region to determine fastest mirror from.
   -M finds the fastest mirror ( if no region is specified with -R, all regions 
     are checked. This option will write to ~/.snaprc.
 
-  -h ( help )
+  -h help
+
+  -d debug
 
   Examples: 
     To update to the latest snapshot using the fastest mirror for your
     region:
 
-      snap -s -R USA -M 
+      snap -s -M ftp3.usa.openbsd.org
 
     Next time you want to do the same, the mirror will already be in
     ~/.snaprc so running the below will have the same effect:
@@ -35,9 +51,200 @@ EOF
   exit 0
 }
 
-while getopts "sfa:sm:sv:spxR:sAM:sh" arg; do
-  if [ $arg == "h" ]; then
-    usage
+function get_conf_var {
+  RET=''
+  if [ -e $CONF_FILE ]; then
+    RET=$( grep $1 $CONF_FILE | awk -F\: '{print $2}' )
   fi
-  echo $arg $OPTARG
+
+  if [ "${RET}X" == "X" ]; then
+    return 1
+  else
+    echo $RET
+  fi
+}
+
+function mkd {
+  if [ ! -e $1 ]; then
+    msg "mkdir: ${1}"
+    mkdir -p $1
+  fi
+}
+
+function msg {
+  if [ $DEBUG == true ]; then
+    echo "${green}${1}${white}"
+  fi
+}
+
+function error {
+  if [ $DEBUG == true ]; then
+    echo "${red}${1}${white}"
+    exit 1;
+  fi
+}
+
+function backup {
+  FAIL=0
+  cp /bsd /obsd || FAIL=1
+  cp /bsd.rd /obsd.rd || FAIL=1
+  cp /sbin/reboot /sbin/oreboot || FAIL=1
+
+  if [ $FAIL == 1 ]; then
+    error "Failed to backup, are you root?"
+  else
+    msg "Backed up the following:
+    ${bold}/bsd => /obsd
+    /bsd.rd => /obsd.rd
+    /sbin/reboot => /sbin/oreboot${green}"
+  fi
+}
+
+function fetch {
+  /usr/bin/ftp $FTP_OPTS $1 
+  if [ $? == 0 ]; then
+    return 0
+  else
+    return $?
+  fi
+}
+
+function extract {
+  FAIL=0
+  if [ $PV == 1 ]; then
+    pv ${1} | tar -C / -xzphf - || FAIL=1
+  else 
+    tar -C / -vxzphf $1 || FAIL=1
+  fi
+
+  if [ $FAIL == 1 ]; then
+    error "Extract of ${1} failed, permissions?"
+  fi
+}
+
+function copy {
+  FAIL=0
+  cp $1 $2 || FAIL=1
+  if [ $FAIL == 1 ]; then
+    error "Can't copy ${1} to ${2}"
+  fi
+}
+
+FTP_OPTS=" -V "
+PROTO="http"
+DST=/tmp/upgrade
+CONF_FILE=~/.snaprc
+CPUS=$( sysctl hw.ncpu | awk -F\= '{print $2}' )
+ARCH=$( arch -s )
+MACHINE=$( machine )
+VER=$( uname -r )
+SETVER=$( uname -r | sed -e 's/\.//' )
+VIRTUAL=$( sysctl hw.model | cut -d\= -f 2 | awk '{print $1}' )
+DEBUG=false;
+PV=0
+if [ -x /usr/local/bin/pv ]; then
+  PV=1
+fi
+
+MIRROR=$( get_conf_var 'MIRROR' || echo 'ftp.openbsd.org' )
+
+while getopts "sfa:sm:sv:sV:spxR:sAM:shd" arg; do
+  case $arg in
+    s)
+      VER='snapshots'
+      ;;
+    s)
+      CONF_FILE=$OPTARG
+      ;;
+    f)
+      PROTO=ftp
+      ;;
+    a)
+      ARCH=$OPTARG
+      ;;
+    m)
+      MACHINE=$OPTARG
+      ;;
+    v)
+      VER=$OPTARG
+      ;;
+    V)
+      SETVER=$( echo $OPTARG | sed -e 's/\.//' )
+      ;;
+    x)
+      NO_X11=true
+      ;;
+    w)
+      WRITE=true
+      ;;
+    M)
+      MIRROR=$OPTARG
+      ;;
+    h)
+      usage
+      ;;
+    d)
+      DEBUG=true
+      ;;
+  esac
 done
+
+backup
+mkd $DST
+
+URL="${PROTO}://${MIRROR}/pub/OpenBSD/${VER}/${ARCH}"
+
+msg "${white}Fetching from: ${green}${URL}"
+
+( 
+  cd $DST
+
+  if [ "${CPUS}" == "1" ]; then
+    msg "${white}Using bsd.."
+    set -A bsds 'bsd' 'bsd.rd'
+    KERNEL='bsd'
+  else
+    msg "${white}Using bsd.mp.."
+    set -A bsds 'bsd.mp' 'bsd.rd'
+    KERNEL='bsd.mp'
+  fi
+
+  msg "Fetching bsds"
+	for bsd in ${bsds[@]}; do
+    fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}"
+    copy ${bsd} /${bsd}
+  done
+
+  msg "Fetching sets"
+	for set in ${sets[@]}; do
+    fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version ( example 5.2 )"
+  done
+
+  if [ ! $NO_X11 ]; then
+    msg "Fetching xsets"
+    for set in ${xsets[@]}; do
+      fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version ( example 5.2 )"
+    done
+  fi
+
+  msg "Extracting sets"
+  for set in ${sets[@]}; do 
+
+		if [ "${set}" != "etc" ]; then
+      extract ${set}${SETVER}.tgz
+    fi
+
+    if [ "${xset}" == "man" ] && [ ! $NO_X11 ]; then
+      msg "Extracting xsets"
+
+      if [ "${set}" != "xetc" ]; then
+        extract ${xset}${SETVER}.tgz
+      fi
+    fi
+  done
+
+  if [ $MERGE ]; then
+    sysmerge -s etc${SETVER}.tgz -x xetc${SETVER}.tgz
+  fi
+)
+
