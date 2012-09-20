@@ -164,7 +164,7 @@ if [ -x /usr/local/bin/pv ]; then
   PV=1
 fi
 
-MIRROR=$( get_conf_var 'MIRROR' || echo 'ftp.openbsd.org' )
+MIRROR=$( get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org' )
 
 while getopts "sfa:sm:sv:srV:spxR:sAM:shd" arg; do
   case $arg in
