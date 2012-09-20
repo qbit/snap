@@ -26,11 +26,9 @@ snap options:
   -m <machine> use <machine> instead of what 'machine -s' returns.
   -v <version> used to force snap to use <version> ( example: snapshots ).
   -V <setversion> used to force snap to use <setversion> for sets ( example: 52 ).
+  -r run sysmerge after extracting {x}sets.
   -x do not extract x11 sets.
-  -w write all options to ~/.snaprc for less optionie usage later
-
-  -M finds the fastest mirror ( if no region is specified with -R, all regions 
-    are checked. This option will write to ~/.snaprc.
+  -M specify a mirror to use ( example: " -M ftp3.usa.openbsd.org" )
 
   -h help
 
@@ -42,10 +40,13 @@ snap options:
 
       snap -s -M ftp3.usa.openbsd.org
 
-    Next time you want to do the same, the mirror will already be in
-    ~/.snaprc so running the below will have the same effect:
-
-      snap -s
+    Example ~/.snaprc
+      DEBUG:true
+      DST:/tmp/upgrade
+      MERGE:true
+      MIRROR:ftp3.usa.openbsd.org
+      NO_X11:true
+      PROTO:ftp
 
 EOF
   exit 0
@@ -61,6 +62,13 @@ function get_conf_var {
     return 1
   else
     echo $RET
+  fi
+}
+
+function set_conf_var {
+  MAKE=false
+  if [ -e $CONF_FILE ]; then
+    MAKE=true
   fi
 }
 
@@ -130,25 +138,34 @@ function copy {
   fi
 }
 
-FTP_OPTS=" -V "
-PROTO="http"
-DST=/tmp/upgrade
+ARCH=$( arch -s )
 CONF_FILE=~/.snaprc
 CPUS=$( sysctl hw.ncpu | awk -F\= '{print $2}' )
-ARCH=$( arch -s )
+DEBUG=$( get_conf_var 'DEBUG' || echo 'false' );
+DST=$( get_conf_var 'DST' || echo '/tmp/upgrade' )
+FTP_OPTS=" -V "
 MACHINE=$( machine )
-VER=$( uname -r )
-SETVER=$( uname -r | sed -e 's/\.//' )
-VIRTUAL=$( sysctl hw.model | cut -d\= -f 2 | awk '{print $1}' )
-DEBUG=false;
+MERGE=$( get_conf_var 'MERGE' || echo 'false' )
+NO_X11=$( get_conf_var 'NO_X11' || echo 'false' );
+PROTO=$( get_conf_var 'PROTO' || echo 'http' )
 PV=0
+SETVER=$( uname -r | sed -e 's/\.//' )
+VER=$( uname -r )
+VIRTUAL=$( sysctl hw.model | cut -d\= -f 2 | awk '{print $1}' )
+
+sysctl kern.version | grep -q "\-current"
+if [ $? == 0 ]; then
+  msg "kern.version: ${white}reporting as -current"
+  VER='snapshots'
+fi
+
 if [ -x /usr/local/bin/pv ]; then
   PV=1
 fi
 
 MIRROR=$( get_conf_var 'MIRROR' || echo 'ftp.openbsd.org' )
 
-while getopts "sfa:sm:sv:sV:spxR:sAM:shd" arg; do
+while getopts "sfa:sm:sv:srV:spxR:sAM:shd" arg; do
   case $arg in
     s)
       VER='snapshots'
@@ -174,8 +191,8 @@ while getopts "sfa:sm:sv:sV:spxR:sAM:shd" arg; do
     x)
       NO_X11=true
       ;;
-    w)
-      WRITE=true
+    r)
+      MERGE=true
       ;;
     M)
       MIRROR=$OPTARG
@@ -200,11 +217,11 @@ msg "${white}Fetching from: ${green}${URL}"
   cd $DST
 
   if [ "${CPUS}" == "1" ]; then
-    msg "${white}Using bsd.."
+    msg "${white}Using ${green}bsd.."
     set -A bsds 'bsd' 'bsd.rd'
     KERNEL='bsd'
   else
-    msg "${white}Using bsd.mp.."
+    msg "${white}Using ${green}bsd.mp.."
     set -A bsds 'bsd.mp' 'bsd.rd'
     KERNEL='bsd.mp'
   fi
@@ -217,13 +234,13 @@ msg "${white}Fetching from: ${green}${URL}"
 
   msg "Fetching sets"
 	for set in ${sets[@]}; do
-    fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version ( example 5.2 )"
+    fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example 5.2"
   done
 
-  if [ ! $NO_X11 ]; then
+  if [ "${NO_X11}" == "false" ]; then
     msg "Fetching xsets"
     for set in ${xsets[@]}; do
-      fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version ( example 5.2 )"
+      fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example -V 5.2"
     done
   fi
 
@@ -234,17 +251,26 @@ msg "${white}Fetching from: ${green}${URL}"
       extract ${set}${SETVER}.tgz
     fi
 
-    if [ "${xset}" == "man" ] && [ ! $NO_X11 ]; then
-      msg "Extracting xsets"
+    if [ "${set}" == "man" ] && [ "${NO_X11}" == "false" ]; then
+      msg "Extracting xsets ${white} will continue with sets after. ${green}"
 
-      if [ "${set}" != "xetc" ]; then
-        extract ${xset}${SETVER}.tgz
-      fi
+      for xset in ${xsets[@]}; do
+        if [ "${xset}" != "xetc" ]; then
+          extract ${xset}${SETVER}.tgz
+        fi
+      done
     fi
   done
 
   if [ $MERGE ]; then
     sysmerge -s etc${SETVER}.tgz -x xetc${SETVER}.tgz
+  else 
+    echo "Don't forget to run:\n\tsysmerge -s ${DST}/etc${SETVER}.tgz -x ${DST}/xetc${SETVER}.tgz"
+  fi
+
+  if [ "${VIRTUAL}" == "QEMU" ]; then
+    msg "Running as VM, please disable mpbios"
+    config -e -f /bsd
   fi
 )
 
