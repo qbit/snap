@@ -1,6 +1,6 @@
 snap
 ====
-OpenBSD upgrade management script. 
+OpenBSD upgrade script. 
 
 Features
 ========
