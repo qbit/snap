@@ -209,7 +209,7 @@ done
 backup
 mkd $DST
 
-URL="${PROTO}://${MIRROR}/pub/OpenBSD/${VER}/${ARCH}"
+URL="${PROTO}://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
 
 msg "${white}Fetching from: ${green}${URL}"
 
