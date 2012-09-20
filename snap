@@ -97,6 +97,7 @@ function backup {
   cp /bsd /obsd || FAIL=1
   cp /bsd.rd /obsd.rd || FAIL=1
   cp /sbin/reboot /sbin/oreboot || FAIL=1
+  cp /bin/tar /bin/otar || FAIL=1
 
   if [ $FAIL == 1 ]; then
     error "Failed to backup, are you root?"
@@ -120,9 +121,9 @@ function fetch {
 function extract {
   FAIL=0
   if [ $PV == 1 ]; then
-    pv ${1} | tar -C / -xzphf - || FAIL=1
+    pv ${1} | otar -C / -xzphf - || FAIL=1
   else 
-    tar -C / -vxzphf $1 || FAIL=1
+    otar -C / -vxzphf $1 || FAIL=1
   fi
 
   if [ $FAIL == 1 ]; then
