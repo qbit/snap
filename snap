@@ -21,6 +21,7 @@ snap options:
 
   -s force snap to use snapshots.
   -c specify location of config file ( default is ~/.snaprc )
+  -e just extract sets in DST.
   -f force snap to use ftp sources ( http is default ).
   -a <arch> use <arch> instead of what is 'arch' returns.
   -m <machine> use <machine> instead of what 'machine -s' returns.
@@ -165,7 +166,7 @@ fi
 
 MIRROR=$( get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org' )
 
-while getopts "sfa:sm:sv:srV:spxR:sAM:shd" arg; do
+while getopts "sfea:sm:sv:srV:spxR:sAM:shd" arg; do
   case $arg in
     s)
       VER='snapshots'
@@ -178,6 +179,9 @@ while getopts "sfa:sm:sv:srV:spxR:sAM:shd" arg; do
       ;;
     a)
       ARCH=$OPTARG
+      ;;
+    e)
+      EXTRACT_ONLY=true
       ;;
     m)
       MACHINE=$OPTARG
@@ -226,22 +230,24 @@ msg "${white}Fetching from: ${green}${URL}"
     KERNEL='bsd.mp'
   fi
 
-  msg "Fetching bsds"
-	for bsd in ${bsds[@]}; do
-    fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}"
-    copy ${bsd} /${bsd}
-  done
+  if [ ! EXTRACT_ONLY ]; then
+	  msg "Fetching bsds"
+		for bsd in ${bsds[@]}; do
+	    fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}"
+	    copy ${bsd} /${bsd}
+	  done
 
-  msg "Fetching sets"
-	for set in ${sets[@]}; do
-    fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example 5.2"
-  done
+	  msg "Fetching sets"
+		for set in ${sets[@]}; do
+	    fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example 5.2"
+	  done
 
-  if [ "${NO_X11}" == "false" ]; then
-    msg "Fetching xsets"
-    for set in ${xsets[@]}; do
-      fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example -V 5.2"
-    done
+	  if [ "${NO_X11}" == "false" ]; then
+	    msg "Fetching xsets"
+	    for set in ${xsets[@]}; do
+	      fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example -V 5.2"
+	    done
+	  fi
   fi
 
   msg "Extracting sets"
