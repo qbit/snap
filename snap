@@ -142,12 +142,13 @@ function copy {
 ARCH=$( arch -s )
 CONF_FILE=~/.snaprc
 CPUS=$( sysctl hw.ncpu | awk -F\= '{print $2}' )
-DEBUG=$( get_conf_var 'DEBUG' || echo 'false' );
+DEBUG=$( get_conf_var 'DEBUG' || echo 'false' )
 DST=$( get_conf_var 'DST' || echo '/tmp/upgrade' )
+EXTRACT_ONLY=false
 FTP_OPTS=" -V "
 MACHINE=$( machine )
 MERGE=$( get_conf_var 'MERGE' || echo 'false' )
-NO_X11=$( get_conf_var 'NO_X11' || echo 'false' );
+NO_X11=$( get_conf_var 'NO_X11' || echo 'false' )
 PROTO=$( get_conf_var 'PROTO' || echo 'http' )
 PV=0
 SETVER=$( uname -r | sed -e 's/\.//' )
@@ -230,7 +231,7 @@ msg "${white}Fetching from: ${green}${URL}"
     KERNEL='bsd.mp'
   fi
 
-  if [ ! EXTRACT_ONLY ]; then
+  if [ $EXTRACT_ONLY == false ]; then
 	  msg "Fetching bsds"
 		for bsd in ${bsds[@]}; do
 	    fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}"
