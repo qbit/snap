@@ -12,7 +12,7 @@ bold="\033[01;39m"
 white="\033[0m"
 
 set -A sets 'comp' 'game' 'man' 'etc' 'base'
-set -A xsets 'xbase' 'xserv' 'xshare' 'xetc'
+set -A xsets 'xbase' 'xfont' 'xserv' 'xshare' 'xetc'
 
 function usage {
   cat <<EOF
