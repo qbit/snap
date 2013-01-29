@@ -109,6 +109,18 @@ function backup {
   fi
 }
 
+function update_kernel {
+  FAIL=0
+  cp bsd /bsd.sp || FAIL=1
+  cp ${KERNEL} /bsd || FAIL=1
+  if [ $FAIL == 1 ]; then
+    error "Failed to copy new kernel, are you root?"
+  else
+    msg "Set primary kernel to ${KERNEL}:
+    ${KERNEL} => /bsd"
+  fi
+}
+
 function fetch {
   /usr/bin/ftp $FTP_OPTS $1 
   if [ $? == 0 ]; then
@@ -221,13 +233,13 @@ msg "${white}Fetching from: ${green}${URL}"
 ( 
   cd $DST
 
+  set -A bsds 'bsd' 'bsd.mp' 'bsd.rd'
+
   if [ "${CPUS}" == "1" ]; then
     msg "${white}Using ${green}bsd.."
-    set -A bsds 'bsd' 'bsd.rd'
     KERNEL='bsd'
   else
     msg "${white}Using ${green}bsd.mp.."
-    set -A bsds 'bsd.mp' 'bsd.rd'
     KERNEL='bsd.mp'
   fi
 
@@ -235,8 +247,8 @@ msg "${white}Fetching from: ${green}${URL}"
 	  msg "Fetching bsds"
 		for bsd in ${bsds[@]}; do
 	    fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}"
-	    copy ${bsd} /${bsd}
 	  done
+    update_kernel
 
 	  msg "Fetching sets"
 		for set in ${sets[@]}; do
