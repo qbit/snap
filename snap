@@ -141,7 +141,7 @@ function copy {
 
 ARCH=$( arch -s )
 CONF_FILE=~/.snaprc
-CPUS=$( sysctl hw.ncpu | awk -F\= '{print $2}' )
+CPUS=$( sysctl hw.ncpufound | awk -F\= '{print $2}' )
 DEBUG=$( get_conf_var 'DEBUG' || echo 'false' )
 DST=$( get_conf_var 'DST' || echo '/tmp/upgrade' )
 EXTRACT_ONLY=false
