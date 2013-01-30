@@ -25,7 +25,7 @@ snap options:
   -a <arch> use <arch> instead of what is 'arch' returns.
   -m <machine> use <machine> instead of what 'machine -s' returns.
   -v <version> used to force snap to use <version> ( example: snapshots ).
-  -V <setversion> used to force snap to use <setversion> for sets ( example: 52 ).
+  -V <setversion> used to force snap to use <setversion> for sets ( example: -V 5.2 ).
   -r run sysmerge after extracting {x}sets.
   -x do not extract x11 sets.
   -M specify a mirror to use ( example: " -M ftp3.usa.openbsd.org" )
