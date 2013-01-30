@@ -12,7 +12,7 @@ bold="\033[01;39m"
 white="\033[0m"
 
 set -A sets 'comp' 'game' 'man' 'etc' 'base'
-set -A xsets 'xbase' 'xserv' 'xshare' 'xetc'
+set -A xsets 'xbase' 'xfont' 'xserv' 'xshare' 'xetc'
 
 function usage {
   cat <<EOF
@@ -21,6 +21,7 @@ snap options:
 
   -s force snap to use snapshots.
   -c specify location of config file ( default is ~/.snaprc )
+  -e just extract sets in DST.
   -f force snap to use ftp sources ( http is default ).
   -a <arch> use <arch> instead of what is 'arch' returns.
   -m <machine> use <machine> instead of what 'machine -s' returns.
@@ -108,6 +109,18 @@ function backup {
   fi
 }
 
+function update_kernel {
+  FAIL=0
+  cp bsd /bsd.sp || FAIL=1
+  cp ${KERNEL} /bsd || FAIL=1
+  if [ $FAIL == 1 ]; then
+    error "Failed to copy new kernel, are you root?"
+  else
+    msg "Set primary kernel to ${KERNEL}:
+    ${KERNEL} => /bsd"
+  fi
+}
+
 function fetch {
   /usr/bin/ftp $FTP_OPTS $1 
   if [ $? == 0 ]; then
@@ -140,13 +153,14 @@ function copy {
 
 ARCH=$( arch -s )
 CONF_FILE=~/.snaprc
-CPUS=$( sysctl hw.ncpu | awk -F\= '{print $2}' )
-DEBUG=$( get_conf_var 'DEBUG' || echo 'false' );
+CPUS=$( sysctl hw.ncpufound | awk -F\= '{print $2}' )
+DEBUG=$( get_conf_var 'DEBUG' || echo 'false' )
 DST=$( get_conf_var 'DST' || echo '/tmp/upgrade' )
+EXTRACT_ONLY=false
 FTP_OPTS=" -V "
 MACHINE=$( machine )
 MERGE=$( get_conf_var 'MERGE' || echo 'false' )
-NO_X11=$( get_conf_var 'NO_X11' || echo 'false' );
+NO_X11=$( get_conf_var 'NO_X11' || echo 'false' )
 PROTO=$( get_conf_var 'PROTO' || echo 'http' )
 PV=0
 SETVER=$( uname -r | sed -e 's/\.//' )
@@ -165,7 +179,7 @@ fi
 
 MIRROR=$( get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org' )
 
-while getopts "sfa:sm:sv:srV:spxR:sAM:shd" arg; do
+while getopts "sfea:sm:sv:srV:spxR:sAM:shd" arg; do
   case $arg in
     s)
       VER='snapshots'
@@ -178,6 +192,9 @@ while getopts "sfa:sm:sv:srV:spxR:sAM:shd" arg; do
       ;;
     a)
       ARCH=$OPTARG
+      ;;
+    e)
+      EXTRACT_ONLY=true
       ;;
     m)
       MACHINE=$OPTARG
@@ -216,32 +233,34 @@ msg "${white}Fetching from: ${green}${URL}"
 ( 
   cd $DST
 
+  set -A bsds 'bsd' 'bsd.mp' 'bsd.rd'
+
   if [ "${CPUS}" == "1" ]; then
     msg "${white}Using ${green}bsd.."
-    set -A bsds 'bsd' 'bsd.rd'
     KERNEL='bsd'
   else
     msg "${white}Using ${green}bsd.mp.."
-    set -A bsds 'bsd.mp' 'bsd.rd'
     KERNEL='bsd.mp'
   fi
 
-  msg "Fetching bsds"
-	for bsd in ${bsds[@]}; do
-    fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}"
-    copy ${bsd} /${bsd}
-  done
+  if [ $EXTRACT_ONLY == false ]; then
+	  msg "Fetching bsds"
+		for bsd in ${bsds[@]}; do
+	    fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}"
+	  done
+    update_kernel
 
-  msg "Fetching sets"
-	for set in ${sets[@]}; do
-    fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example 5.2"
-  done
+	  msg "Fetching sets"
+		for set in ${sets[@]}; do
+	    fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example 5.2"
+	  done
 
-  if [ "${NO_X11}" == "false" ]; then
-    msg "Fetching xsets"
-    for set in ${xsets[@]}; do
-      fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example -V 5.2"
-    done
+	  if [ "${NO_X11}" == "false" ]; then
+	    msg "Fetching xsets"
+	    for set in ${xsets[@]}; do
+	      fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example -V 5.2"
+	    done
+	  fi
   fi
 
   msg "Extracting sets"
