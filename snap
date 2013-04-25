@@ -291,5 +291,7 @@ msg "${white}Fetching from: ${green}${URL}"
     msg "Running as VM, please disable mpbios"
     config -e -f /bsd
   fi
+
+  date > ~/.last_snap
 )
 
