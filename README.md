@@ -34,7 +34,7 @@ Examples
 
     snap -s -M ftp3.usa.openbsd.org
 
-  To update to the lastest version of 5.3 without updating sets:
+  To update to the lastest version of 5.3 without updating xsets:
     
     snap -v 5.3 -V 5.3 -x -M ftp3.usa.openbsd.org
 
