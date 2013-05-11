@@ -11,21 +11,32 @@ Features
 
 Usage
 =====
+* -s force snap to use snapshots.
+* -c specify location of config file (default is ~/.snaprc)
+* -e just extract sets in DST.
+* -f force snap to use ftp sources (http is default).
+* -a <arch> use <arch> instead of what is 'arch' returns.
+* -m <machine> use <machine> instead of what 'machine -s' returns.
+* -v <version> used to force snap to use <version> (examples: snapshots or 5.3).
+* -V <setversion> used to force snap to use <setversion> for sets (example: -V 5.3). Note: this will only apend 53 to sets, ie base53.tgz
+* -r run sysmerge after extracting {x}sets.
+* -x do not extract x11 sets.
+* -M specify a mirror to use (example: " -M ftp3.usa.openbsd.org")
 
-*  -s force snap to use snapshots.
-*  -c specify location of config file ( default is ~/.snaprc )
-*  -f force snap to use ftp sources ( http is default ).
-*  -a <arch> use <arch> instead of what is 'arch' returns.
-*  -m <machine> use <machine> instead of what 'machine -s' returns.
-*  -v <version> used to force snap to use <version> ( example: snapshots ).
-*  -V <setversion> used to force snap to use <setversion> for sets ( example: 52 ).
-*  -r run sysmerge after extracting {x}sets.
-*  -x do not extract x11 sets.
-*  -M specify a mirror to use ( example: " -M ftp3.usa.openbsd.org" )
+* -h help
 
-*  -h help
+* -d debug
 
-*  -d debug
+Examples
+========
+  To update to the latest snapshot using the fastest mirror for your
+  region:
+
+    snap -s -M ftp3.usa.openbsd.org
+
+  To update to the lastest version of 5.3 without updating sets:
+    
+    snap -v 5.3 -V 5.3 -x -M ftp3.usa.openbsd.org
 
 Sample .snaprc
 ==============
