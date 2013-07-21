@@ -29,7 +29,7 @@ Usage
 
 Examples
 ========
-  To update to the latest snapshot using the fastest mirror for your
+  To update to the latest snapshot using an explicit mirror
   region:
 
     snap -s -M ftp3.usa.openbsd.org
