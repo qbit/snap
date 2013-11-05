@@ -32,6 +32,8 @@ snap options:
   -M specify a mirror to use (example: " -M ftp3.usa.openbsd.org")
   -i interactive with colors
   -n force using bsd.mp as bsd
+  -k only install kernels and exit
+  -B do not backup current kernel
   -h help
 
   Examples: 
@@ -183,7 +185,7 @@ fi
 
 MIRROR=$( get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org' )
 
-while getopts "sfea:sm:sv:srV:spxR:sAM:shin" arg; do
+while getopts "sfea:sm:sv:srV:spxR:sAM:shiBkn" arg; do
   case $arg in
     s)
       VER='snapshots'
@@ -224,13 +226,22 @@ while getopts "sfea:sm:sv:srV:spxR:sAM:shin" arg; do
     i)
       INTERACTIVE=true
       ;;
+    B)
+      NO_KBACKUPS=true
+      ;;
+    k)
+      KERNEL_ONLY=true
+      ;;
     n)
       FORCE_MP=true
       ;;
   esac
 done
 
-backup
+if [ -z $NO_KBACKUPS ]; then
+  backup
+fi
+
 mkd $DST
 
 URL="${PROTO}://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
@@ -251,15 +262,19 @@ msg "${white}Fetching from: ${green}${URL}"
   fi
 
   if [ $EXTRACT_ONLY == false ]; then
-	  msg "Fetching bsds"
-		for bsd in ${bsds[@]}; do
-	    fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}"
-	  done
+    msg "Fetching bsds"
+    for bsd in ${bsds[@]}; do
+      fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}"
+    done
 
-          update_kernel
+    update_kernel
+
+    if [ $KERNEL_ONLY == true ]; then
+      exit 0
+    fi
 
 	  msg "Fetching sets"
-		for set in ${sets[@]}; do
+          for set in ${sets[@]}; do
 	    fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example 5.2"
 	  done
 
