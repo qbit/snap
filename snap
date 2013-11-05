@@ -253,7 +253,7 @@ msg "${white}Fetching from: ${green}${URL}"
 
   set -A bsds 'bsd' 'bsd.mp' 'bsd.rd'
 
-  if [ "${CPUS}" == "1" ] && [ FORCE_MP != true ]; then
+  if [ "${CPUS}" == "1" ] && [ -z $FORCE_MP ]; then
     msg "${white}Using ${green}bsd.."
     KERNEL='bsd'
   else
