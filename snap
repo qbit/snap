@@ -92,7 +92,7 @@ function error {
   if [ $INTERACTIVE == true ]; then
     echo "${red}${1}${white}"
   fi
-  exit 1;
+  exit 1
 }
 
 function backup {
