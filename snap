@@ -31,6 +31,7 @@ snap options:
   -x do not extract x11 sets.
   -M specify a mirror to use (example: " -M ftp3.usa.openbsd.org")
   -i interactive with colors
+  -n force using bsd.mp as bsd
   -h help
 
   Examples: 
@@ -182,7 +183,7 @@ fi
 
 MIRROR=$( get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org' )
 
-while getopts "sfea:sm:sv:srV:spxR:sAM:shi" arg; do
+while getopts "sfea:sm:sv:srV:spxR:sAM:shin" arg; do
   case $arg in
     s)
       VER='snapshots'
@@ -223,6 +224,9 @@ while getopts "sfea:sm:sv:srV:spxR:sAM:shi" arg; do
     i)
       INTERACTIVE=true
       ;;
+    n)
+      FORCE_MP=true
+      ;;
   esac
 done
 
@@ -238,7 +242,7 @@ msg "${white}Fetching from: ${green}${URL}"
 
   set -A bsds 'bsd' 'bsd.mp' 'bsd.rd'
 
-  if [ "${CPUS}" == "1" ]; then
+  if [ "${CPUS}" == "1" ] && [ FORCE_MP != true ]; then
     msg "${white}Using ${green}bsd.."
     KERNEL='bsd'
   else
