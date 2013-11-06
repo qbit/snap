@@ -115,6 +115,7 @@ function update_kernel {
   FAIL=0
   cp bsd /bsd.sp || FAIL=1
   cp ${KERNEL} /bsd || FAIL=1
+  cp bsd.rd /bsd.rd || FAIL=1
   if [ $FAIL == 1 ]; then
     error "Failed to copy new kernel, are you root?"
   else
@@ -250,7 +251,8 @@ msg "${white}Fetching from: ${green}${URL}"
 		for bsd in ${bsds[@]}; do
 	    fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}"
 	  done
-    update_kernel
+
+          update_kernel
 
 	  msg "Fetching sets"
 		for set in ${sets[@]}; do
