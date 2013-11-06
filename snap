@@ -91,10 +91,8 @@ function msg {
 }
 
 function error {
-  if [ $DEBUG == true ]; then
     echo "${red}${1}${white}"
     exit 1;
-  fi
 }
 
 function backup {
