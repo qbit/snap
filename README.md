@@ -22,10 +22,11 @@ Usage
 * -r run sysmerge after extracting {x}sets.
 * -x do not extract x11 sets.
 * -M specify a mirror to use (example: " -M ftp3.usa.openbsd.org")
-
+* -i interactive with colors
+* -n force using bsd.mp as bsd
+* -k only install kernels and exit
+* -B do not backup current kernel
 * -h help
-
-* -d debug
 
 Examples
 ========
