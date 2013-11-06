@@ -30,10 +30,11 @@ snap options:
   -r run sysmerge after extracting {x}sets.
   -x do not extract x11 sets.
   -M specify a mirror to use (example: " -M ftp3.usa.openbsd.org")
-
+  -i interactive with colors
+  -n force using bsd.mp as bsd
+  -k only install kernels and exit
+  -B do not backup current kernel
   -h help
-
-  -d debug
 
   Examples: 
     To update to the latest snapshot using the fastest mirror for your
@@ -46,7 +47,7 @@ snap options:
       snap -v 5.3 -V 5.3 -x -M ftp3.usa.openbsd.org
 
   Example ~/.snaprc
-    DEBUG:true
+    INTERACTIVE:true
     DST:/tmp/upgrade
     MERGE:true
     MIRROR:ftp3.usa.openbsd.org
@@ -85,14 +86,16 @@ function mkd {
 }
 
 function msg {
-  if [ $DEBUG == true ]; then
+  if [ $INTERACTIVE == true ]; then
     echo "${green}${1}${white}"
   fi
 }
 
 function error {
+  if [ $INTERACTIVE == true ]; then
     echo "${red}${1}${white}"
-    exit 1;
+  fi
+  exit 1
 }
 
 function backup {
@@ -157,7 +160,7 @@ function copy {
 ARCH=$( arch -s )
 CONF_FILE=~/.snaprc
 CPUS=$( sysctl hw.ncpufound | awk -F\= '{print $2}' )
-DEBUG=$( get_conf_var 'DEBUG' || echo 'false' )
+INTERACTIVE=$( get_conf_var 'INTERACTIVE' || echo 'false' )
 DST=$( get_conf_var 'DST' || echo '/tmp/upgrade' )
 EXTRACT_ONLY=false
 FTP_OPTS=" -V "
@@ -182,7 +185,7 @@ fi
 
 MIRROR=$( get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org' )
 
-while getopts "sfea:sm:sv:srV:spxR:sAM:shd" arg; do
+while getopts "sfea:sm:sv:srV:spxR:sAM:shiBkn" arg; do
   case $arg in
     s)
       VER='snapshots'
@@ -220,13 +223,25 @@ while getopts "sfea:sm:sv:srV:spxR:sAM:shd" arg; do
     h)
       usage
       ;;
-    d)
-      DEBUG=true
+    i)
+      INTERACTIVE=true
+      ;;
+    B)
+      NO_KBACKUPS=true
+      ;;
+    k)
+      KERNEL_ONLY=true
+      ;;
+    n)
+      FORCE_MP=true
       ;;
   esac
 done
 
-backup
+if [ -z $NO_KBACKUPS ]; then
+  backup
+fi
+
 mkd $DST
 
 URL="${PROTO}://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
@@ -238,7 +253,7 @@ msg "${white}Fetching from: ${green}${URL}"
 
   set -A bsds 'bsd' 'bsd.mp' 'bsd.rd'
 
-  if [ "${CPUS}" == "1" ]; then
+  if [ "${CPUS}" == "1" ] && [ -z $FORCE_MP ]; then
     msg "${white}Using ${green}bsd.."
     KERNEL='bsd'
   else
@@ -247,15 +262,19 @@ msg "${white}Fetching from: ${green}${URL}"
   fi
 
   if [ $EXTRACT_ONLY == false ]; then
-	  msg "Fetching bsds"
-		for bsd in ${bsds[@]}; do
-	    fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}"
-	  done
+    msg "Fetching bsds"
+    for bsd in ${bsds[@]}; do
+      fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}"
+    done
 
-          update_kernel
+    update_kernel
+
+    if [ $KERNEL_ONLY == true ]; then
+      exit 0
+    fi
 
 	  msg "Fetching sets"
-		for set in ${sets[@]}; do
+          for set in ${sets[@]}; do
 	    fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example 5.2"
 	  done
 
