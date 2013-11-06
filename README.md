@@ -43,7 +43,7 @@ Sample .snaprc
 ==============
 
 ```
- DEBUG:true
+ INTERACTIVE:true
  DST:/tmp/upgrade
  MERGE:true
  MIRROR:ftp3.usa.openbsd.org
