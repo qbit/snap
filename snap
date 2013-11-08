@@ -1,4 +1,4 @@
-#!/bin/ksh -x
+#!/bin/ksh 
 
 grey="\033[01;30m"
 red="\033[01;31m"
