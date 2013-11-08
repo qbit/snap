@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/ksh -x
 
 grey="\033[01;30m"
 red="\033[01;31m"
@@ -116,9 +116,9 @@ function backup {
 
 function update_kernel {
   FAIL=0
-  cp bsd /bsd.sp || FAIL=1
+  #cp bsd /bsd.sp || FAIL=1
   cp ${KERNEL} /bsd || FAIL=1
-  cp bsd.rd /bsd.rd || FAIL=1
+  cp ${RD} /bsd.rd || FAIL=1
   if [ $FAIL == 1 ]; then
     error "Failed to copy new kernel, are you root?"
   else
@@ -163,6 +163,7 @@ CPUS=$( sysctl hw.ncpufound | awk -F\= '{print $2}' )
 INTERACTIVE=$( get_conf_var 'INTERACTIVE' || echo 'false' )
 DST=$( get_conf_var 'DST' || echo '/tmp/upgrade' )
 EXTRACT_ONLY=false
+KERNEL_ONLY=false
 FTP_OPTS=" -V "
 MACHINE=$( machine )
 MERGE=$( get_conf_var 'MERGE' || echo 'false' )
@@ -251,15 +252,27 @@ msg "${white}Fetching from: ${green}${URL}"
 ( 
   cd $DST
 
-  set -A bsds 'bsd' 'bsd.mp' 'bsd.rd'
+  # first element should be bsd, second should be mp for given kernel names.
+  if [ "${MACHINE}" == "armv7" ]; then
+    TYPE=$(uname -v | awk -F\- '{print $NF}' | cut -d# -f1)
+    # Currently there is no bsd.mp
+    #set -A bsds "bsd.${TYPE}" "bsd.mp.${TYPE}" "bsd.rd.${TYPE}" "bsd.${TYPE}.umg"
+    set -A bsds "bsd.${TYPE}" "" "bsd.rd.${TYPE}" "bsd.${TYPE}.umg"
+  else
+    set -A bsds 'bsd' 'bsd.mp' 'bsd.rd'
+  fi
+
+  RD=${bsds[2]}
 
   if [ "${CPUS}" == "1" ] && [ -z $FORCE_MP ]; then
     msg "${white}Using ${green}bsd.."
-    KERNEL='bsd'
+    KERNEL=${bsds[0]}
   else
     msg "${white}Using ${green}bsd.mp.."
-    KERNEL='bsd.mp'
+    KERNEL=${bsds[1]}
   fi
+
+#TODO mount msdos volume and copy umg files.
 
   if [ $EXTRACT_ONLY == false ]; then
     msg "Fetching bsds"
