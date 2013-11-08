@@ -8,6 +8,7 @@ Features
 * Store config options in an rc file.
 * Smarts about virtualized hardware.
 * Auto # cpu detection.
+* Auto detection of arch type for arm: OMAP, IMX.
 
 Usage
 =====
