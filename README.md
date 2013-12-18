@@ -10,6 +10,14 @@ Features
 * Auto # cpu detection.
 * Auto detection of arch type for arm: OMAP, IMX.
 
+Installation
+============
+
+``` sh
+ftp https://raw.github.com/qbit/snap/master/snap
+sudo install -m 755 snap /usr/local/bin
+```
+
 Usage
 =====
 * -s force snap to use snapshots.
