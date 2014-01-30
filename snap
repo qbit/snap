@@ -13,13 +13,15 @@ white="\033[0m"
 
 set -A sets 'comp' 'game' 'man' 'etc' 'base'
 set -A xsets 'xbase' 'xfont' 'xserv' 'xshare' 'xetc'
+base_sig='SHA256.sig'
 
 function usage {
   cat <<EOF
 
-snap options: 
+snap options:
 
   -s force snap to use snapshots.
+  -S don't check signatures.
   -c specify location of config file (default is ~/.snaprc)
   -e just extract sets in DST.
   -f force snap to use ftp sources (http is default).
@@ -114,9 +116,24 @@ function backup {
   fi
 }
 
+function verisigs {
+  KEY=/etc/signify/${SETVER}base.pub
+  VALID=true
+  for i in $(ls); do
+    signify -V -e -p ${KEY} -x SHA256.sig -m - | sha256 -C - ${i} \
+      || VALID=false
+  done
+
+  if [ $VALID == false ]; then
+    error "Invalid signature found! They are after you!"
+  fi
+}
+
 function update_kernel {
   FAIL=0
-  #cp bsd /bsd.sp || FAIL=1
+  if [ $SKIP_SIGN == false ]; then
+    verisigs
+  fi
   cp ${KERNEL} /bsd || FAIL=1
   cp ${RD} /bsd.rd || FAIL=1
   if [ $FAIL == 1 ]; then
@@ -159,6 +176,7 @@ function copy {
 
 ARCH=$( arch -s )
 CONF_FILE=~/.snaprc
+SKIP_SIGN=false
 CPUS=$( sysctl hw.ncpufound | awk -F\= '{print $2}' )
 INTERACTIVE=$( get_conf_var 'INTERACTIVE' || echo 'false' )
 DST=$( get_conf_var 'DST' || echo '/tmp/upgrade' )
@@ -197,6 +215,9 @@ while getopts "sfea:sm:sv:srV:spxR:sAM:shiBkn" arg; do
       ;;
     s)
       CONF_FILE=$OPTARG
+      ;;
+    S)
+      SKIP_SIGN=true
       ;;
     f)
       PROTO=ftp
@@ -274,6 +295,10 @@ msg "${white}Fetching from: ${green}${URL}"
   else
     msg "${white}Using ${green}bsd.mp.."
     KERNEL=${bsds[1]}
+  fi
+
+  if [ $SKIP_SIGN == false ]; then
+    fetch "${URL}/${base_sig}" || error "Can't fetch signature file!"
   fi
 
 #TODO mount msdos volume and copy umg files.
