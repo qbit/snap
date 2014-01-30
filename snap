@@ -1,4 +1,4 @@
-#!/bin/ksh 
+#!/bin/ksh
 
 grey="\033[01;30m"
 red="\033[01;31m"
@@ -38,14 +38,14 @@ snap options:
   -B do not backup current kernel
   -h help
 
-  Examples: 
+  Examples:
     To update to the latest snapshot using the fastest mirror for your
     region:
 
       snap -s -M ftp3.usa.openbsd.org
 
     To update to the lastest version of 5.3 without updating xsets:
-      
+
       snap -v 5.3 -V 5.3 -x -M ftp3.usa.openbsd.org
 
   Example ~/.snaprc
@@ -145,7 +145,7 @@ function update_kernel {
 }
 
 function fetch {
-  /usr/bin/ftp $FTP_OPTS $1 
+  /usr/bin/ftp $FTP_OPTS $1
   if [ $? == 0 ]; then
     return 0
   else
@@ -157,7 +157,7 @@ function extract {
   FAIL=0
   if [ $PV == 1 ]; then
     pv ${1} | tar -C / -xzphf - || FAIL=1
-  else 
+  else
     tar -C / -vxzphf $1 || FAIL=1
   fi
 
@@ -193,7 +193,7 @@ VER=$( uname -r )
 VIRTUAL=$( sysctl hw.model | cut -d\= -f 2 | awk '{print $1}' )
 
 if [ -e ~/.last_snap ]; then
-	msg "last snap run: ${white}$(cat ~/.last_snap)"
+  msg "last snap run: ${white}$(cat ~/.last_snap)"
 fi
 
 sysctl kern.version | grep -q "\-current"
@@ -274,7 +274,7 @@ URL="${PROTO}://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
 
 msg "${white}Fetching from: ${green}${URL}"
 
-( 
+(
   cd $DST
 
   # first element should be bsd, second should be mp for given kernel names.
@@ -315,23 +315,28 @@ msg "${white}Fetching from: ${green}${URL}"
       exit 0
     fi
 
-	  msg "Fetching sets"
-          for set in ${sets[@]}; do
-	    fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example 5.2"
-	  done
+     msg "Fetching sets"
+     for set in ${sets[@]}; do
+       fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example 5.2"
+     done
 
-	  if [ "${NO_X11}" == "false" ]; then
-	    msg "Fetching xsets"
-	    for set in ${xsets[@]}; do
-	      fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example -V 5.2"
-	    done
-	  fi
+     if [ "${NO_X11}" == "false" ]; then
+       msg "Fetching xsets"
+       for set in ${xsets[@]}; do
+         fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example -V 5.2"
+       done
+     fi
+  fi
+
+  if [ $SKIP_SIGN == false ]; then
+    # todo - remove duplicate verifycation of signatures (bsd,bsd.rd..etc)
+    verisigs
   fi
 
   msg "Extracting sets"
-  for set in ${sets[@]}; do 
+  for set in ${sets[@]}; do
 
-		if [ "${set}" != "etc" ]; then
+    if [ "${set}" != "etc" ]; then
       extract ${set}${SETVER}.tgz
     fi
 
@@ -349,10 +354,10 @@ msg "${white}Fetching from: ${green}${URL}"
   if [ $MERGE ]; then
     if [ "${NO_X11}" == "false" ]; then
       sysmerge -s etc${SETVER}.tgz -x xetc${SETVER}.tgz
-    else 
+    else
       sysmerge -s etc${SETVER}.tgz
     fi
-  else 
+  else
     echo "Don't forget to run:\n\tsysmerge -s ${DST}/etc${SETVER}.tgz -x ${DST}/xetc${SETVER}.tgz"
   fi
 
