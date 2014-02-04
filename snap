@@ -119,7 +119,8 @@ function backup {
 function verisigs {
   KEY=/etc/signify/${SETVER}base.pub
   VALID=true
-  for i in $(ls); do
+
+  for i in $@; do
     signify -V -e -p ${KEY} -x SHA256.sig -m - | sha256 -C - ${i} \
       || VALID=false
   done
@@ -132,7 +133,7 @@ function verisigs {
 function update_kernel {
   FAIL=0
   if [ $SKIP_SIGN == false ]; then
-    verisigs
+    verisigs "bsd*"
   fi
   cp ${KERNEL} /bsd || FAIL=1
   cp ${RD} /bsd.rd || FAIL=1
@@ -329,8 +330,7 @@ msg "${white}Fetching from: ${green}${URL}"
   fi
 
   if [ $SKIP_SIGN == false ]; then
-    # todo - remove duplicate verifycation of signatures (bsd,bsd.rd..etc)
-    verisigs
+    verisigs "*.tgz"
   fi
 
   msg "Extracting sets"
