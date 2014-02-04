@@ -21,7 +21,7 @@ function usage {
 snap options:
 
   -s force snap to use snapshots.
-  -S don't check signatures.
+  -S do not check signatures.
   -c specify location of config file (default is ~/.snaprc)
   -e just extract sets in DST.
   -f force snap to use ftp sources (http is default).

@@ -22,6 +22,7 @@ sudo install -m 755 snap /usr/local/bin
 Usage
 =====
 * -s force snap to use snapshots.
+* -S do not check signatures.
 * -c specify location of config file (default is ~/.snaprc)
 * -e just extract sets in DST.
 * -f force snap to use ftp sources (http is default).
