@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Snap by qbit</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1>Snap</h1>
+        <p>OpenBSD upgrade tool (OpenBSD,Shell)</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/qbit/snap" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/qbit/snap/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/qbit/snap/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <h1>
+<a name="snap" class="anchor" href="#snap"><span class="octicon octicon-link"></span></a>snap</h1>
+
+<p>OpenBSD upgrade script. </p>
+
+<h1>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h1>
+
+<ul>
+<li>Upgrade to a release, or to snaps.</li>
+<li>Store config options in an rc file.</li>
+<li>Smarts about virtualized hardware.</li>
+<li>Auto # cpu detection.</li>
+<li>Auto detection of arch type for arm: OMAP, IMX.</li>
+<li>Signing support with <a href="http://www.openbsd.org/cgi-bin/man.cgi?query=signify&amp;apropos=0&amp;sektion=0&amp;manpath=OpenBSD+Current&amp;arch=i386&amp;format=html">signify(1)</a>
+</li>
+</ul><h1>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h1>
+
+<div class="highlight highlight-sh"><pre>ftp https://raw.github.com/qbit/snap/master/snap
+sudo install -m 755 snap /usr/local/bin
+</pre></div>
+
+<h1>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h1>
+
+<ul>
+<li>-s force snap to use snapshots.</li>
+<li>-S do not check signatures.</li>
+<li>-c specify location of config file (default is ~/.snaprc)</li>
+<li>-e just extract sets in DST.</li>
+<li>-f force snap to use ftp sources (http is default).</li>
+<li>-a  use  instead of what is 'arch' returns.</li>
+<li>-m  use  instead of what 'machine -s' returns.</li>
+<li>-v  used to force snap to use  (examples: snapshots or 5.3).</li>
+<li>-V  used to force snap to use  for sets (example: -V 5.3). Note: this will only apend 53 to sets, ie base53.tgz</li>
+<li>-r run sysmerge after extracting {x}sets.</li>
+<li>-x do not extract x11 sets.</li>
+<li>-M specify a mirror to use (example: " -M ftp3.usa.openbsd.org")</li>
+<li>-i interactive with colors</li>
+<li>-n force using bsd.mp as bsd</li>
+<li>-k only install kernels and exit</li>
+<li>-B do not backup current kernel</li>
+<li>-h help</li>
+</ul><h1>
+<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h1>
+
+<p>To update to the latest snapshot using an explicit mirror
+  region:</p>
+
+<pre><code>snap -s -M ftp3.usa.openbsd.org
+</code></pre>
+
+<p>To update to the lastest version of 5.3 without updating xsets:</p>
+
+<pre><code>snap -v 5.3 -V 5.3 -x -M ftp3.usa.openbsd.org
+</code></pre>
+
+<h1>
+<a name="sample-snaprc" class="anchor" href="#sample-snaprc"><span class="octicon octicon-link"></span></a>Sample .snaprc</h1>
+
+<pre><code> INTERACTIVE:true
+ DST:/tmp/upgrade
+ MERGE:true
+ MIRROR:ftp3.usa.openbsd.org
+ NO_X11:true
+ PROTO:ftp
+</code></pre>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/qbit">qbit</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
