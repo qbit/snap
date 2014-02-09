@@ -209,12 +209,12 @@ fi
 
 MIRROR=$( get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org' )
 
-while getopts "sfea:sm:sv:srV:spxR:sAM:shiBkn" arg; do
+while getopts "sSfea:sm:sv:srV:spxR:sAM:shiBkn" arg; do
   case $arg in
     s)
       VER='snapshots'
       ;;
-    s)
+    c)
       CONF_FILE=$OPTARG
       ;;
     S)
