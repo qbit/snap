@@ -352,10 +352,14 @@ msg "${white}Fetching from: ${green}${URL}"
   done
 
   if [ $MERGE ]; then
+    MERG_OPT=""
+    if [ $SKIP_SIGN == true ]; then
+      MERG_OPT="-S"
+    fi
     if [ "${NO_X11}" == "false" ]; then
-      sysmerge -s etc${SETVER}.tgz -x xetc${SETVER}.tgz
+      sysmerge ${MERG_OPT} -s etc${SETVER}.tgz -x xetc${SETVER}.tgz
     else
-      sysmerge -s etc${SETVER}.tgz
+      sysmerge ${MERG_OPT} -s etc${SETVER}.tgz
     fi
   else
     echo "Don't forget to run:\n\tsysmerge -s ${DST}/etc${SETVER}.tgz -x ${DST}/xetc${SETVER}.tgz"
