@@ -117,7 +117,7 @@ function backup {
 }
 
 function verisigs {
-  KEY=/etc/signify/${SETVER}base.pub
+  KEY=/etc/signify/openbsd-${SETVER}-base.pub
   VALID=true
 
   for i in $@; do
