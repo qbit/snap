@@ -191,7 +191,7 @@ PROTO=$( get_conf_var 'PROTO' || echo 'http' )
 PV=0
 SETVER=$( uname -r | sed -e 's/\.//' )
 VER=$( uname -r )
-VIRTUAL=$( sysctl hw.model | cut -d\= -f 2 | awk '{print $1}' )
+VIRTUAL=$( sysctl -n hw.model | awk '{print $1}' )
 
 if [ -e ~/.last_snap ]; then
   msg "last snap run: ${white}$(cat ~/.last_snap)"
