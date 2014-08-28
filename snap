@@ -336,7 +336,7 @@ msg "${white}Fetching from: ${green}${URL}"
   msg "Extracting sets"
   for set in ${sets[@]}; do
 
-    if [ "${set}" != "etc" ]; then
+    if [ "${set}" != "etc" ] && [ "${set}" != "xetc" ]; then
       extract ${set}${SETVER}.tgz
     fi
 
