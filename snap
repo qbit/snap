@@ -11,8 +11,8 @@ bold="\033[01;39m"
 
 white="\033[0m"
 
-set -A sets 'comp' 'game' 'man' 'etc' 'base'
-set -A xsets 'xbase' 'xfont' 'xserv' 'xshare' 'xetc'
+set -A sets 'comp' 'game' 'man' 'base'
+set -A xsets 'xbase' 'xfont' 'xserv' 'xshare'
 base_sig='SHA256.sig'
 
 function usage {
@@ -335,32 +335,19 @@ msg "${white}Fetching from: ${green}${URL}"
 
   msg "Extracting sets"
   for set in ${sets[@]}; do
-
-    if [ "${set}" != "etc" ] && [ "${set}" != "xetc" ]; then
-      extract ${set}${SETVER}.tgz
-    fi
-
+    extract ${set}${SETVER}.tgz
+ 
     if [ "${set}" == "man" ] && [ "${NO_X11}" == "false" ]; then
       msg "Extracting xsets ${white} will continue with sets after. ${green}"
 
       for xset in ${xsets[@]}; do
-        if [ "${xset}" != "xetc" ]; then
-          extract ${xset}${SETVER}.tgz
-        fi
+        extract ${xset}${SETVER}.tgz
       done
     fi
   done
 
   if [ $MERGE ]; then
-    MERG_OPT=""
-    if [ $SKIP_SIGN == true ]; then
-      MERG_OPT="-S"
-    fi
-    if [ "${NO_X11}" == "false" ]; then
-      sysmerge ${MERG_OPT} -s etc${SETVER}.tgz -x xetc${SETVER}.tgz
-    else
-      sysmerge ${MERG_OPT} -s etc${SETVER}.tgz
-    fi
+    sysmerge ${MERG_OPT}
   else
     echo "Don't forget to run:\n\tsysmerge -s ${DST}/etc${SETVER}.tgz -x ${DST}/xetc${SETVER}.tgz"
   fi
