@@ -2,6 +2,10 @@ snap
 ====
 OpenBSD upgrade script. 
 
+Changes
+=======
+* 2014-09-26 : Pull in the fixes for etc and xetc set removal.
+
 Features
 ========
 * Upgrade to a release, or to snaps.
