@@ -146,7 +146,7 @@ function verisigs {
   done
 
   if [ $VALID == false ]; then
-    error "Invalid signature found! They are after you!"
+    error "Invalid signature found! They are after you!" true
   fi
 }
 
@@ -342,13 +342,13 @@ msg "${white}Fetching from: ${green}${URL}"
 
      msg "Fetching sets"
      for set in ${sets[@]}; do
-       fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example 5.2"
+       fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example 5.2" true
      done
 
      if [ "${NO_X11}" == "false" ]; then
        msg "Fetching xsets"
        for set in ${xsets[@]}; do
-         fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example -V 5.2"
+         fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example -V 5.2" true
        done
      fi
   fi
@@ -360,7 +360,7 @@ msg "${white}Fetching from: ${green}${URL}"
   msg "Extracting sets"
   for set in ${sets[@]}; do
     extract ${set}${SETVER}.tgz
- 
+
     if [ "${set}" == "man" ] && [ "${NO_X11}" == "false" ]; then
       msg "Extracting xsets ${white} will continue with sets after. ${green}"
 
