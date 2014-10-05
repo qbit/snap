@@ -107,7 +107,7 @@ function backup {
   cp /sbin/reboot /sbin/oreboot || FAIL=1
 
   if [ $FAIL == 1 ]; then
-    error "Failed to backup, are you root?"
+    error "Failed to backup"
   else
     msg "Backed up the following:
     ${bold}/bsd => /obsd
@@ -138,7 +138,7 @@ function update_kernel {
   cp ${KERNEL} /bsd || FAIL=1
   cp ${RD} /bsd.rd || FAIL=1
   if [ $FAIL == 1 ]; then
-    error "Failed to copy new kernel, are you root?"
+    error "Failed to copy new kernel"
   else
     msg "Set primary kernel to ${KERNEL}:
     ${KERNEL} => /bsd"
