@@ -267,10 +267,6 @@ while getopts "sSfea:sm:sv:srV:spxR:sAM:shiBkn" arg; do
   esac
 done
 
-if [ -z $NO_KBACKUPS ]; then
-  backup
-fi
-
 mkd $DST
 
 URL="${PROTO}://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
@@ -292,13 +288,7 @@ msg "${white}Fetching from: ${green}${URL}"
 
   RD=${bsds[2]}
 
-  if [ "${CPUS}" == "1" ] && [ -z $FORCE_MP ]; then
-    msg "${white}Using ${green}bsd.."
-    KERNEL=${bsds[0]}
-  else
-    msg "${white}Using ${green}bsd.mp.."
-    KERNEL=${bsds[1]}
-  fi
+
 
   if [ $SKIP_SIGN == false ]; then
     fetch "${URL}/${base_sig}" || error "Can't fetch signature file!"
@@ -311,6 +301,18 @@ msg "${white}Fetching from: ${green}${URL}"
     for bsd in ${bsds[@]}; do
       fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}"
     done
+
+    if [ "${CPUS}" == "1" ] && [ -z $FORCE_MP ]; then
+      msg "${white}Using ${green}bsd.."
+      KERNEL=${bsds[0]}
+    else
+      msg "${white}Using ${green}bsd.mp.."
+      KERNEL=${bsds[1]}
+    fi
+
+    if [ -z $NO_KBACKUPS ]; then
+      backup
+    fi
 
     update_kernel
 
