@@ -97,6 +97,9 @@ function error {
   if [ $INTERACTIVE == true ]; then
     echo "${red}${1}${white}"
   fi
+  if [ $2 ] && [ $2 == true ]; then
+    rollback
+  fi
   exit 1
 }
 
@@ -114,6 +117,23 @@ function backup {
     /bsd.rd => /obsd.rd
     /sbin/reboot => /sbin/oreboot${green}"
   fi
+}
+
+function rollback {
+  FAIL=0
+  cp /obsd /bsd || FAIL=1
+  cp /obsd.rd /bsd.rd || FAIL=1
+  cp /sbin/oreboot /sbin/reboot || FAIL=1
+
+  if [ $FAIL == 1 ]; then
+    error "Failed to rollback"
+  else
+    msg "Restored the old files for the following:
+    ${bold}/bsd => /obsd
+    /bsd.rd => /obsd.rd
+    /sbin/reboot => /sbin/oreboot${green}"
+  fi
+
 }
 
 function verisigs {
