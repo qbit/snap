@@ -10,7 +10,6 @@ Features
 ========
 * Upgrade to a release, or to snaps.
 * Store config options in an rc file.
-* Smarts about virtualized hardware.
 * Auto # cpu detection.
 * Auto detection of arch type for arm: OMAP, IMX.
 * Signing support with [signify(1)](http://www.openbsd.org/cgi-bin/man.cgi?query=signify&apropos=0&sektion=0&manpath=OpenBSD+Current&arch=i386&format=html)
