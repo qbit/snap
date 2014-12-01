@@ -211,7 +211,6 @@ PROTO=$( get_conf_var 'PROTO' || echo 'http' )
 PV=0
 SETVER=$( uname -r | sed -e 's/\.//' )
 VER=$( uname -r )
-VIRTUAL=$( sysctl -n hw.model | awk '{print $1}' )
 
 [[ $(id -u) -ne 0 ]] && error "${0##*/}: need root privileges"
 
@@ -374,11 +373,6 @@ msg "${white}Fetching from: ${green}${URL}"
     sysmerge ${MERG_OPT}
   else
     echo "Don't forget to run:\n\tsysmerge -s ${DST}/etc${SETVER}.tgz -x ${DST}/xetc${SETVER}.tgz"
-  fi
-
-  if [ "${VIRTUAL}" == "QEMU" ]; then
-    msg "Running as VM, please disable mpbios"
-    config -e -f /bsd
   fi
 
   date > ~/.last_snap
