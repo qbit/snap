@@ -54,7 +54,6 @@ snap options:
     MERGE:true
     MIRROR:ftp3.usa.openbsd.org
     NO_X11:true
-    PROTO:ftp
 
 EOF
   exit 0
@@ -207,7 +206,6 @@ FTP_OPTS=" -V "
 MACHINE=$( machine )
 MERGE=$( get_conf_var 'MERGE' || echo 'false' )
 NO_X11=$( get_conf_var 'NO_X11' || echo 'false' )
-PROTO=$( get_conf_var 'PROTO' || echo 'http' )
 PV=0
 SETVER=$( uname -r | sed -e 's/\.//' )
 VER=$( uname -r )
@@ -240,9 +238,6 @@ while getopts "sSfea:sm:sv:srV:spxR:sAM:shiBkn" arg; do
       ;;
     S)
       SKIP_SIGN=true
-      ;;
-    f)
-      PROTO=ftp
       ;;
     a)
       ARCH=$OPTARG
@@ -288,7 +283,7 @@ done
 
 mkd $DST
 
-URL="${PROTO}://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
+URL="http://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
 
 msg "${white}Fetching from: ${green}${URL}"
 
