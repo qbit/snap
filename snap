@@ -367,7 +367,7 @@ msg "${white}Fetching from: ${green}${URL}"
   if [ $MERGE ]; then
     sysmerge ${MERG_OPT}
   else
-    echo "Don't forget to run:\n\tsysmerge -s ${DST}/etc${SETVER}.tgz -x ${DST}/xetc${SETVER}.tgz"
+    echo 'Don't forget to run sysmerge!'
   fi
 
   date > ~/.last_snap
