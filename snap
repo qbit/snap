@@ -54,7 +54,6 @@ snap options:
     MERGE:true
     MIRROR:ftp3.usa.openbsd.org
     NO_X11:true
-    PROTO:ftp
 
 EOF
   exit 0
@@ -97,6 +96,9 @@ function error {
   if [ $INTERACTIVE == true ]; then
     echo "${red}${1}${white}"
   fi
+  if [ $2 ] && [ $2 == true ]; then
+    rollback
+  fi
   exit 1
 }
 
@@ -107,13 +109,30 @@ function backup {
   cp /sbin/reboot /sbin/oreboot || FAIL=1
 
   if [ $FAIL == 1 ]; then
-    error "Failed to backup, are you root?"
+    error "Failed to backup"
   else
     msg "Backed up the following:
     ${bold}/bsd => /obsd
     /bsd.rd => /obsd.rd
     /sbin/reboot => /sbin/oreboot${green}"
   fi
+}
+
+function rollback {
+  FAIL=0
+  cp /obsd /bsd || FAIL=1
+  cp /obsd.rd /bsd.rd || FAIL=1
+  cp /sbin/oreboot /sbin/reboot || FAIL=1
+
+  if [ $FAIL == 1 ]; then
+    error "Failed to rollback"
+  else
+    msg "Restored the old files for the following:
+    ${bold}/bsd => /obsd
+    /bsd.rd => /obsd.rd
+    /sbin/reboot => /sbin/oreboot${green}"
+  fi
+
 }
 
 function verisigs {
@@ -126,7 +145,7 @@ function verisigs {
   done
 
   if [ $VALID == false ]; then
-    error "Invalid signature found! They are after you!"
+    error "Invalid signature found! They are after you!" true
   fi
 }
 
@@ -138,7 +157,7 @@ function update_kernel {
   cp ${KERNEL} /bsd || FAIL=1
   cp ${RD} /bsd.rd || FAIL=1
   if [ $FAIL == 1 ]; then
-    error "Failed to copy new kernel, are you root?"
+    error "Failed to copy new kernel"
   else
     msg "Set primary kernel to ${KERNEL}:
     ${KERNEL} => /bsd"
@@ -187,11 +206,11 @@ FTP_OPTS=" -V "
 MACHINE=$( machine )
 MERGE=$( get_conf_var 'MERGE' || echo 'false' )
 NO_X11=$( get_conf_var 'NO_X11' || echo 'false' )
-PROTO=$( get_conf_var 'PROTO' || echo 'http' )
 PV=0
 SETVER=$( uname -r | sed -e 's/\.//' )
 VER=$( uname -r )
-VIRTUAL=$( sysctl -n hw.model | awk '{print $1}' )
+
+[[ $(id -u) -ne 0 ]] && error "${0##*/}: need root privileges"
 
 if [ -e ~/.last_snap ]; then
   msg "last snap run: ${white}$(cat ~/.last_snap)"
@@ -219,9 +238,6 @@ while getopts "sSfea:sm:sv:srV:spxR:sAM:shiBkn" arg; do
       ;;
     S)
       SKIP_SIGN=true
-      ;;
-    f)
-      PROTO=ftp
       ;;
     a)
       ARCH=$OPTARG
@@ -265,13 +281,9 @@ while getopts "sSfea:sm:sv:srV:spxR:sAM:shiBkn" arg; do
   esac
 done
 
-if [ -z $NO_KBACKUPS ]; then
-  backup
-fi
-
 mkd $DST
 
-URL="${PROTO}://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
+URL="http://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
 
 msg "${white}Fetching from: ${green}${URL}"
 
@@ -290,13 +302,7 @@ msg "${white}Fetching from: ${green}${URL}"
 
   RD=${bsds[2]}
 
-  if [ "${CPUS}" == "1" ] && [ -z $FORCE_MP ]; then
-    msg "${white}Using ${green}bsd.."
-    KERNEL=${bsds[0]}
-  else
-    msg "${white}Using ${green}bsd.mp.."
-    KERNEL=${bsds[1]}
-  fi
+
 
   if [ $SKIP_SIGN == false ]; then
     fetch "${URL}/${base_sig}" || error "Can't fetch signature file!"
@@ -310,6 +316,18 @@ msg "${white}Fetching from: ${green}${URL}"
       fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}"
     done
 
+    if [ "${CPUS}" == "1" ] && [ -z $FORCE_MP ]; then
+      msg "${white}Using ${green}bsd.."
+      KERNEL=${bsds[0]}
+    else
+      msg "${white}Using ${green}bsd.mp.."
+      KERNEL=${bsds[1]}
+    fi
+
+    if [ -z $NO_KBACKUPS ]; then
+      backup
+    fi
+
     update_kernel
 
     if [ $KERNEL_ONLY == true ]; then
@@ -318,13 +336,13 @@ msg "${white}Fetching from: ${green}${URL}"
 
      msg "Fetching sets"
      for set in ${sets[@]}; do
-       fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example 5.2"
+       fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example 5.2" true
      done
 
      if [ "${NO_X11}" == "false" ]; then
        msg "Fetching xsets"
        for set in ${xsets[@]}; do
-         fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example -V 5.2"
+         fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example -V 5.2" true
        done
      fi
   fi
@@ -336,7 +354,7 @@ msg "${white}Fetching from: ${green}${URL}"
   msg "Extracting sets"
   for set in ${sets[@]}; do
     extract ${set}${SETVER}.tgz
- 
+
     if [ "${set}" == "man" ] && [ "${NO_X11}" == "false" ]; then
       msg "Extracting xsets ${white} will continue with sets after. ${green}"
 
@@ -349,12 +367,7 @@ msg "${white}Fetching from: ${green}${URL}"
   if [ $MERGE ]; then
     sysmerge ${MERG_OPT}
   else
-    echo "Don't forget to run:\n\tsysmerge -s ${DST}/etc${SETVER}.tgz -x ${DST}/xetc${SETVER}.tgz"
-  fi
-
-  if [ "${VIRTUAL}" == "QEMU" ]; then
-    msg "Running as VM, please disable mpbios"
-    config -e -f /bsd
+    echo 'Don't forget to run sysmerge!'
   fi
 
   date > ~/.last_snap
