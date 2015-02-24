@@ -28,7 +28,6 @@ Usage
 * -S do not check signatures.
 * -c specify location of config file (default is ~/.snaprc)
 * -e just extract sets in DST.
-* -f force snap to use ftp sources (http is default).
 * -a <arch> use <arch> instead of what is 'arch' returns.
 * -m <machine> use <machine> instead of what 'machine -s' returns.
 * -v <version> used to force snap to use <version> (examples: snapshots or 5.3).
@@ -62,5 +61,4 @@ Sample .snaprc
  MERGE:true
  MIRROR:ftp3.usa.openbsd.org
  NO_X11:true
- PROTO:ftp
 ```
