@@ -271,9 +271,9 @@ if [ -e ~/.last_snap ]; then
   msg "last snap run: ${white}$(cat ~/.last_snap)"
 fi
 
-sysctl kern.version | grep -q "\-current"
+kern_ver=$(sysctl kern.version | grep -oE "\-(current|beta)")
 if [ $? == 0 ]; then
-  msg "kern.version: ${white}reporting as -current"
+  msg "kern.version: ${white}reporting as $kern_ver"
   VER='snapshots'
 fi
 
