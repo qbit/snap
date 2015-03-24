@@ -1,5 +1,7 @@
 #!/bin/ksh
 
+version=1.0.1
+
 grey="\033[01;30m"
 red="\033[01;31m"
 green="\033[01;32m"
@@ -16,7 +18,7 @@ set -A xsets 'xbase' 'xfont' 'xserv' 'xshare'
 base_sig='SHA256.sig'
 
 function usage {
-  cat <<EOF
+    cat <<EOF
 
 snap options:
 
@@ -36,6 +38,8 @@ snap options:
   -n force using bsd.mp as bsd
   -k only install kernels and exit
   -B do not backup current kernel
+  -u do not check for update to snap script
+  -b do not run installboot (not implemented)
   -h help
 
   Examples:
@@ -56,62 +60,78 @@ snap options:
     NO_X11:true
 
 EOF
-  exit 0
+    exit 0
 }
 
 function get_conf_var {
-  RET=''
-  if [ -e $CONF_FILE ]; then
-    RET=$( grep $1 $CONF_FILE | awk -F\: '{print $2}' )
-  fi
+    RET=''
+    if [ -e $CONF_FILE ]; then
+	RET=$( grep $1 $CONF_FILE | awk -F\: '{print $2}' )
+    fi
 
-  if [ "${RET}X" == "X" ]; then
-    return 1
-  else
-    echo $RET
-  fi
+    if [ "${RET}X" == "X" ]; then
+	return 1
+    else
+	echo $RET
+    fi
 }
 
 function set_conf_var {
-  MAKE=false
-  if [ -e $CONF_FILE ]; then
-    MAKE=true
-  fi
+    MAKE=false
+    if [ -e $CONF_FILE ]; then
+	MAKE=true
+    fi
 }
 
 function mkd {
-  if [ ! -e $1 ]; then
-    msg "mkdir: ${1}"
-    mkdir -p $1
-  fi
+    if [ ! -e $1 ]; then
+	msg "mkdir: ${1}"
+	mkdir -p $1
+    fi
 }
 
 function msg {
-  if [ $INTERACTIVE == true ]; then
-    echo "${green}${1}${white}"
-  fi
+    if [ $INTERACTIVE == true ]; then
+	echo "${green}${1}${white}"
+    fi
 }
 
 function error {
-  if [ $INTERACTIVE == true ]; then
-    echo "${red}${1}${white}"
-  fi
-  if [ $2 ] && [ $2 == true ]; then
-    rollback
-  fi
-  exit 1
+    if [ $INTERACTIVE == true ]; then
+	echo "${red}${1}${white}"
+    fi
+    if [ $2 ] && [ $2 == true ]; then
+	rollback
+    fi
+    exit 1
+}
+
+function check_update {
+    R="https://api.github.com/repos/qbit/snap/releases/latest"
+    LATEST=$(/usr/bin/ftp $FTP_OPTS -M -o - $R | \
+		    awk -F, '{for(i=1;i<NF;i++){if(match($i, /tag_name/)){print $i}}}' | \
+		    cut -d: -f 2 | \
+		    sed -e 's/"//g')
+    if [ $version == $LATEST ]; then
+	msg "snap${white} is up to date!"
+    else
+	msg "${white}Update ${bold}${LATEST}${white} available for ${bold}snap${white}!"
+	#TODO add a dance here to update the script
+	# https://raw.githubusercontent.com/qbit/snap/${LATEST}/snap
+	sleep 5;
+    fi
 }
 
 function backup {
-  FAIL=0
-  cp /bsd /obsd || FAIL=1
-  cp /bsd.rd /obsd.rd || FAIL=1
-  cp /sbin/reboot /sbin/oreboot || FAIL=1
+    FAIL=0
+    cp /bsd /obsd || FAIL=1
+    cp /bsd.rd /obsd.rd || FAIL=1
+    cp /sbin/reboot /sbin/oreboot || FAIL=1
 
-  if [ $FAIL == 1 ]; then
-    error "Failed to backup"
-  else
-    msg "Backed up the following:
+    if [ $FAIL == 1 ]; then
+	error "Failed to backup"
+    else
+	msg "Backed up the following:
     ${bold}/bsd => /obsd
     /bsd.rd => /obsd.rd
     /sbin/reboot => /sbin/oreboot${green}"
@@ -119,15 +139,15 @@ function backup {
 }
 
 function rollback {
-  FAIL=0
-  cp /obsd /bsd || FAIL=1
-  cp /obsd.rd /bsd.rd || FAIL=1
-  cp /sbin/oreboot /sbin/reboot || FAIL=1
+    FAIL=0
+    cp /obsd /bsd || FAIL=1
+    cp /obsd.rd /bsd.rd || FAIL=1
+    cp /sbin/oreboot /sbin/reboot || FAIL=1
 
-  if [ $FAIL == 1 ]; then
-    error "Failed to rollback"
-  else
-    msg "Restored the old files for the following:
+    if [ $FAIL == 1 ]; then
+	error "Failed to rollback"
+    else
+	msg "Restored the old files for the following:
     ${bold}/bsd => /obsd
     /bsd.rd => /obsd.rd
     /sbin/reboot => /sbin/oreboot${green}"
@@ -136,149 +156,161 @@ function rollback {
 }
 
 function verisigs {
-  KEY=/etc/signify/openbsd-${SETVER}-base.pub
-  VALID=true
+    KEY=/etc/signify/openbsd-${SETVER}-base.pub
+    VALID=true
 
-  for i in $@; do
-    signify -V -e -p ${KEY} -x SHA256.sig -m - | sha256 -C - ${i} \
-      || VALID=false
-  done
+    for i in $@; do
+	signify -V -e -p ${KEY} -x SHA256.sig -m - | sha256 -C - ${i} \
+	    || VALID=false
+    done
 
-  if [ $VALID == false ]; then
-    error "Invalid signature found! They are after you!" true
-  fi
+    if [ $VALID == false ]; then
+	error "Invalid signature found! They are after you!" true
+    fi
 }
 
 function update_kernel {
-  FAIL=0
-  if [ $SKIP_SIGN == false ]; then
-    verisigs "bsd*"
-  fi
-  cp ${KERNEL} /bsd || FAIL=1
-  cp ${RD} /bsd.rd || FAIL=1
-  if [ $FAIL == 1 ]; then
-    error "Failed to copy new kernel"
-  else
-    msg "Set primary kernel to ${KERNEL}:
+    FAIL=0
+    if [ $SKIP_SIGN == false ]; then
+	verisigs "bsd*"
+    fi
+    cp ${KERNEL} /bsd || FAIL=1
+    cp ${RD} /bsd.rd || FAIL=1
+    if [ $FAIL == 1 ]; then
+	error "Failed to copy new kernel"
+    else
+	msg "Set primary kernel to ${KERNEL}:
     ${KERNEL} => /bsd"
   fi
 }
 
 function fetch {
-  /usr/bin/ftp $FTP_OPTS $1
-  if [ $? == 0 ]; then
-    return 0
-  else
-    return $?
-  fi
+    /usr/bin/ftp $FTP_OPTS $1
+    if [ $? == 0 ]; then
+	return 0
+    else
+	return $?
+    fi
 }
 
 function extract {
-  FAIL=0
-  if [ $PV == 1 ]; then
-    pv ${1} | tar -C / -xzphf - || FAIL=1
-  else
-    tar -C / -vxzphf $1 || FAIL=1
-  fi
+    FAIL=0
+    if [ $PV == 1 ]; then
+	pv ${1} | tar -C / -xzphf - || FAIL=1
+    else
+	tar -C / -vxzphf $1 || FAIL=1
+    fi
 
-  if [ $FAIL == 1 ]; then
-    error "Extract of ${1} failed, permissions?"
-  fi
+    if [ $FAIL == 1 ]; then
+	error "Extract of ${1} failed, permissions?"
+    fi
 }
 
 function copy {
-  FAIL=0
-  cp $1 $2 || FAIL=1
-  if [ $FAIL == 1 ]; then
-    error "Can't copy ${1} to ${2}"
-  fi
+    FAIL=0
+    cp $1 $2 || FAIL=1
+    if [ $FAIL == 1 ]; then
+	error "Can't copy ${1} to ${2}"
+    fi
 }
 
 ARCH=$( arch -s )
 CONF_FILE=~/.snaprc
 SKIP_SIGN=false
-CPUS=$( sysctl hw.ncpufound | awk -F\= '{print $2}' )
-INTERACTIVE=$( get_conf_var 'INTERACTIVE' || echo 'false' )
-DST=$( get_conf_var 'DST' || echo '/tmp/upgrade' )
+CPUS=$(sysctl hw.ncpufound | awk -F\= '{print $2}')
+INTERACTIVE=$(get_conf_var 'INTERACTIVE' || echo 'false')
+DST=$(get_conf_var 'DST' || echo '/tmp/upgrade')
 EXTRACT_ONLY=false
 KERNEL_ONLY=false
 FTP_OPTS=" -V "
-MACHINE=$( machine )
-MERGE=$( get_conf_var 'MERGE' || echo 'false' )
-NO_X11=$( get_conf_var 'NO_X11' || echo 'false' )
+MACHINE=$(machine)
+MERGE=$(get_conf_var 'MERGE' || echo 'false')
+NO_X11=$(get_conf_var 'NO_X11' || echo 'false')
 PV=0
-SETVER=$( uname -r | sed -e 's/\.//' )
-VER=$( uname -r )
+SETVER=$(uname -r | sed -e 's/\.//')
+VER=$(uname -r)
+NO_UPDATE=$(get_conf_var 'NO_UPDATE' || echo 'false')
+NO_INSTBOOT=$(get_conf_var 'NO_INSTBOOT' || echo 'false')
 
-MIRROR=$( get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org' )
+MIRROR=$(get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org')
 
-while getopts "sSfea:sm:sv:srV:spxR:sAM:shiBkn" arg; do
-  case $arg in
-    s)
-      VER='snapshots'
-      ;;
-    c)
-      CONF_FILE=$OPTARG
-      ;;
-    S)
-      SKIP_SIGN=true
-      ;;
-    a)
-      ARCH=$OPTARG
-      ;;
-    e)
-      EXTRACT_ONLY=true
-      ;;
-    m)
-      MACHINE=$OPTARG
-      ;;
-    v)
-      VER=$OPTARG
-      ;;
-    V)
-      SETVER=$( echo $OPTARG | sed -e 's/\.//' )
-      ;;
-    x)
-      NO_X11=true
-      ;;
-    r)
-      MERGE=true
-      ;;
-    M)
-      MIRROR=$OPTARG
-      ;;
-    h)
-      usage
-      ;;
-    i)
-      INTERACTIVE=true
-      ;;
-    B)
-      NO_KBACKUPS=true
-      ;;
-    k)
-      KERNEL_ONLY=true
-      ;;
-    n)
-      FORCE_MP=true
-      ;;
-  esac
+while getopts "sSfea:sm:sv:srV:spxR:sAM:shiBknub" arg; do
+    case $arg in
+	s)
+	    VER='snapshots'
+	    ;;
+	c)
+	    CONF_FILE=$OPTARG
+	    ;;
+	S)
+	    SKIP_SIGN=true
+	    ;;
+	a)
+	    ARCH=$OPTARG
+	    ;;
+	e)
+	    EXTRACT_ONLY=true
+	    ;;
+	m)
+	    MACHINE=$OPTARG
+	    ;;
+	v)
+	    VER=$OPTARG
+	    ;;
+	V)
+	    SETVER=$( echo $OPTARG | sed -e 's/\.//' )
+	    ;;
+	x)
+	    NO_X11=true
+	    ;;
+	r)
+	    MERGE=true
+	    ;;
+	M)
+	    MIRROR=$OPTARG
+	    ;;
+	h)
+	    usage
+	    ;;
+	i)
+	    INTERACTIVE=true
+	    ;;
+	B)
+	    NO_KBACKUPS=true
+	    ;;
+	k)
+	    KERNEL_ONLY=true
+	    ;;
+	n)
+	    FORCE_MP=true
+	    ;;
+	u)
+	    NO_UPDATE=true
+	    ;;
+	b)
+	    NO_INSTBOOT=true
+	    ;;
+    esac
 done
+
+if [ $NO_UPDATE == false ]; then
+    check_update
+fi
 
 [[ $(id -u) -ne 0 ]] && error "${0##*/}: need root privileges"
 
 if [ -e ~/.last_snap ]; then
-  msg "last snap run: ${white}$(cat ~/.last_snap)"
+    msg "last snap run: ${white}$(cat ~/.last_snap)"
 fi
 
 kern_ver=$(sysctl kern.version | grep -oE "\-(current|beta)")
 if [ $? == 0 ]; then
-  msg "kern.version: ${white}reporting as $kern_ver"
-  VER='snapshots'
+    msg "kern.version: ${white}reporting as $kern_ver"
+    VER='snapshots'
 fi
 
 if [ -x /usr/local/bin/pv ]; then
-  PV=1
+    PV=1
 fi
 
 mkd $DST
@@ -288,88 +320,89 @@ URL="http://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
 msg "${white}Fetching from: ${green}${URL}"
 
 (
-  cd $DST
+    cd $DST
 
-  # first element should be bsd, second should be mp for given kernel names.
-  if [ "${MACHINE}" == "armv7" ]; then
-    TYPE=$(uname -v | awk -F\- '{print $NF}' | cut -d# -f1)
-    # Currently there is no bsd.mp
-    #set -A bsds "bsd.${TYPE}" "bsd.mp.${TYPE}" "bsd.rd.${TYPE}" "bsd.${TYPE}.umg"
-    set -A bsds "bsd.${TYPE}" "" "bsd.rd.${TYPE}" "bsd.${TYPE}.umg"
-  else
-    set -A bsds 'bsd' 'bsd.mp' 'bsd.rd'
-  fi
+    # first element should be bsd, second should be mp for given kernel names.
+    if [ "${MACHINE}" == "armv7" ]; then
+	TYPE=$(uname -v | awk -F\- '{print $NF}' | cut -d# -f1)
+	# Currently there is no bsd.mp
+	#set -A bsds "bsd.${TYPE}" "bsd.mp.${TYPE}" "bsd.rd.${TYPE}" "bsd.${TYPE}.umg"
+	set -A bsds "bsd.${TYPE}" "" "bsd.rd.${TYPE}" "bsd.${TYPE}.umg"
+    else
+	set -A bsds 'bsd' 'bsd.mp' 'bsd.rd'
+    fi
 
-  RD=${bsds[2]}
+    RD=${bsds[2]}
 
+    if [ $SKIP_SIGN == false ]; then
+	fetch "${URL}/${base_sig}" || error "Can't fetch signature file!"
+    fi
 
+    #TODO mount msdos volume and copy umg files.
 
-  if [ $SKIP_SIGN == false ]; then
-    fetch "${URL}/${base_sig}" || error "Can't fetch signature file!"
-  fi
+    if [ $EXTRACT_ONLY == false ]; then
+	msg "Fetching bsds"
+	for bsd in ${bsds[@]}; do
+	    fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}"
+	done
 
-#TODO mount msdos volume and copy umg files.
+	if [ "${CPUS}" == "1" ] && [ -z $FORCE_MP ]; then
+	    msg "${white}Using ${green}bsd.."
+	    KERNEL=${bsds[0]}
+	else
+	    msg "${white}Using ${green}bsd.mp.."
+	    KERNEL=${bsds[1]}
+	fi
 
-  if [ $EXTRACT_ONLY == false ]; then
-    msg "Fetching bsds"
-    for bsd in ${bsds[@]}; do
-      fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}"
+	if [ -z $NO_KBACKUPS ]; then
+	    backup
+	fi
+
+	update_kernel
+
+	if [ $KERNEL_ONLY == true ]; then
+	    exit 0
+	fi
+
+	msg "Fetching sets"
+	for set in ${sets[@]}; do
+	    fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example 5.2" true
+	done
+
+	if [ "${NO_X11}" == "false" ]; then
+	    msg "Fetching xsets"
+	    for set in ${xsets[@]}; do
+		fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example -V 5.2" true
+	    done
+	fi
+    fi
+
+    if [ $SKIP_SIGN == false ]; then
+	verisigs "*.tgz"
+    fi
+
+    msg "Extracting sets"
+    for set in ${sets[@]}; do
+	extract ${set}${SETVER}.tgz
+
+	if [ "${set}" == "man" ] && [ "${NO_X11}" == "false" ]; then
+	    msg "Extracting xsets ${white} will continue with sets after. ${green}"
+
+	    for xset in ${xsets[@]}; do
+		extract ${xset}${SETVER}.tgz
+	    done
+	fi
     done
 
-    if [ "${CPUS}" == "1" ] && [ -z $FORCE_MP ]; then
-      msg "${white}Using ${green}bsd.."
-      KERNEL=${bsds[0]}
+    if [ $MERGE ]; then
+	sysmerge ${MERG_OPT} || error "Failed to sysmerge!"
     else
-      msg "${white}Using ${green}bsd.mp.."
-      KERNEL=${bsds[1]}
+	echo "Don't forget to run:\n\tsysmerge -s ${DST}/etc${SETVER}.tgz -x ${DST}/xetc${SETVER}.tgz"
     fi
 
-    if [ -z $NO_KBACKUPS ]; then
-      backup
-    fi
+    #if [ -z $NO_INSTBOOT ]; then
+    # installboot magictofigureoutdisk
+    #fi
 
-    update_kernel
-
-    if [ $KERNEL_ONLY == true ]; then
-      exit 0
-    fi
-
-     msg "Fetching sets"
-     for set in ${sets[@]}; do
-       fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example 5.2" true
-     done
-
-     if [ "${NO_X11}" == "false" ]; then
-       msg "Fetching xsets"
-       for set in ${xsets[@]}; do
-         fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example -V 5.2" true
-       done
-     fi
-  fi
-
-  if [ $SKIP_SIGN == false ]; then
-    verisigs "*.tgz"
-  fi
-
-  msg "Extracting sets"
-  for set in ${sets[@]}; do
-    extract ${set}${SETVER}.tgz
-
-    if [ "${set}" == "man" ] && [ "${NO_X11}" == "false" ]; then
-      msg "Extracting xsets ${white} will continue with sets after. ${green}"
-
-      for xset in ${xsets[@]}; do
-        extract ${xset}${SETVER}.tgz
-      done
-    fi
-  done
-
-  if [ $MERGE ]; then
-    sysmerge ${MERG_OPT}
-  else
-    echo "Don't forget to run:\n\tsysmerge -s ${DST}/etc${SETVER}.tgz -x ${DST}/xetc${SETVER}.tgz"
-  fi
-
-  date > ~/.last_snap
+    date > ~/.last_snap
 )
-
