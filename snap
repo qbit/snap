@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-version=1.0.3
+version=1.0.4
 
 grey="\033[01;30m"
 red="\033[01;31m"
@@ -423,6 +423,7 @@ msg "${white}Fetching from: ${green}${URL}"
 
     if [ $NO_INSTBOOT == false ]; then
 	boot_disk=$(sysctl hw.disknames | cut -d= -f2 | cut -d: -f1)
+	dmesg | grep "root on" | grep -q $boot_disk || error "Can't detect root disk! Manually  run installboot!"
 	msg "Installing bootstrap on ${boot_disk}"
 	installboot -v $boot_disk || error "Something bad happened - check your boot disk!"
     fi
