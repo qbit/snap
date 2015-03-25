@@ -4,6 +4,7 @@ OpenBSD upgrade script.
 
 Changes
 =======
+* 2015-03-25 : Add ability for snap to update itself and run installboot.
 * 2014-09-26 : Pull in the fixes for etc and xetc set removal.
 
 Features
