@@ -17,6 +17,9 @@ set -A sets 'comp' 'game' 'man' 'base'
 set -A xsets 'xbase' 'xfont' 'xserv' 'xshare'
 base_sig='SHA256.sig'
 
+spath=$(dirname -- "${0%/*}")
+sname="${0##*/}"
+
 function usage {
     cat <<EOF
 
@@ -30,17 +33,18 @@ snap options:
   -a <arch> use <arch> instead of what is 'arch' returns.
   -m <machine> use <machine> instead of what 'machine -s' returns.
   -v <version> used to force snap to use <version> (examples: snapshots or 5.3).
-  -V <setversion> used to force snap to use <setversion> for sets (example: -V 5.3). Note: this will only apend 53 to sets, ie base53.tgz
+  -V <setversion> used to force snap to use <setversion> for sets (example: -V 5.3). Note: this will only apend 53 to sets, ie base53.tgz.
   -r run sysmerge after extracting {x}sets.
   -x do not extract x11 sets.
   -M specify a mirror to use (example: " -M ftp3.usa.openbsd.org")
-  -i interactive with colors
-  -n force using bsd.mp as bsd
-  -k only install kernels and exit
-  -B do not backup current kernel
-  -u do not check for update to snap script
-  -b do not run installboot (not implemented)
-  -h help
+  -i interactive with colors.
+  -n force using bsd.mp as bsd.
+  -k only install kernels and exit.
+  -B do not backup current kernel.
+  -u check for update to snap script.
+  -U download new snap script (will replace currently installed version).
+  -b do not run installboot (not implemented).
+  -h help.
 
   Examples:
     To update to the latest snapshot using the fastest mirror for your
@@ -115,11 +119,20 @@ function check_update {
     if [ $version == $LATEST ]; then
 	msg "snap${white} is up to date!"
     else
-	msg "${white}Update ${bold}${LATEST}${white} available for ${bold}snap${white}!"
-	#TODO add a dance here to update the script
-	# https://raw.githubusercontent.com/qbit/snap/${LATEST}/snap
-	sleep 5;
+	msg "${white}Update ${green}${LATEST}${white} available for ${bold}snap${white}!"
+	update_dst=$(mktemp)
+	/usr/bin/ftp $FTP_OPTS -M -o $update_dst https://raw.githubusercontent.com/qbit/snap/${LATEST}/snap
+	if [ $INS_UPDATE ]; then
+	    msg "installing update.."
+	    install_update $update_dst
+	fi
     fi
+}
+
+function install_update {
+    tmp_file=$1
+    msg "${white}cp $tmp_file $spath/$sname"
+    exit 0
 }
 
 function backup {
@@ -229,12 +242,13 @@ NO_X11=$(get_conf_var 'NO_X11' || echo 'false')
 PV=0
 SETVER=$(uname -r | sed -e 's/\.//')
 VER=$(uname -r)
-NO_UPDATE=$(get_conf_var 'NO_UPDATE' || echo 'false')
+CHK_UPDATE=$(get_conf_var 'CHK_UPDATE' || echo 'false')
+INS_UPDATE=$(get_conf_var 'INS_UPDATE' || echo 'false')
 NO_INSTBOOT=$(get_conf_var 'NO_INSTBOOT' || echo 'false')
 
 MIRROR=$(get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org')
 
-while getopts "sSfea:sm:sv:srV:spxR:sAM:shiBknub" arg; do
+while getopts "sSfea:sm:sv:srV:spxR:sAM:shiBknuUb" arg; do
     case $arg in
 	s)
 	    VER='snapshots'
@@ -285,7 +299,10 @@ while getopts "sSfea:sm:sv:srV:spxR:sAM:shiBknub" arg; do
 	    FORCE_MP=true
 	    ;;
 	u)
-	    NO_UPDATE=true
+	    CHK_UPDATE=true
+	    ;;
+	U)
+	    INS_UPDATE=true
 	    ;;
 	b)
 	    NO_INSTBOOT=true
@@ -293,11 +310,11 @@ while getopts "sSfea:sm:sv:srV:spxR:sAM:shiBknub" arg; do
     esac
 done
 
-if [ $NO_UPDATE == false ]; then
+if [ $CHK_UPDATE ]; then
     check_update
 fi
 
-[[ $(id -u) -ne 0 ]] && error "${0##*/}: need root privileges"
+[[ $(id -u) -ne 0 ]] && error "${sname}: need root privileges"
 
 if [ -e ~/.last_snap ]; then
     msg "last snap run: ${white}$(cat ~/.last_snap)"
