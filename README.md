@@ -45,17 +45,17 @@ Usage
 * -b do not run installboot (not implemented).
 * -h help.
 
-Usage for .snaprc
+.snaprc options and defaults
 =================
 
-* INTERACTIVE: false
-* DST: /tmp/upgrade
-* MERGE: false
-* NO_X11: false
-* CHK_UPDATE: false
-* INS_UPDATE: false
-* NO_INSTBOOT: false
-* MIRROR : 'ftp3.usa.openbsd.org'
+* **INTERACTIVE**: *false*
+* **DST**: */tmp/upgrade*
+* **MERGE**: *false*
+* **NO_X11**: *false*
+* **CHK_UPDATE**: *false*
+* **INS_UPDATE**: *false*
+* **NO_INSTBOOT**: *false*
+* **MIRROR**: *'ftp3.usa.openbsd.org'*
 
 Examples
 ========
