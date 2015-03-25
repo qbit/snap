@@ -419,9 +419,11 @@ msg "${white}Fetching from: ${green}${URL}"
 	echo "Don't forget to run:\n\tsysmerge -s ${DST}/etc${SETVER}.tgz -x ${DST}/xetc${SETVER}.tgz"
     fi
 
-    #if [ -z $NO_INSTBOOT ]; then
-    # installboot magictofigureoutdisk
-    #fi
+    if [ $NO_INSTBOOT == false ]; then
+	boot_disk=$(sysctl hw.disknames | cut -d= -f2 | cut -d: -f1)
+	msg "Installing bootstrap on ${boot_disk}"
+	installboot -v $boot_disk || error "Something bad happened - check your boot disk!"
+    fi
 
     date > ~/.last_snap
 )
