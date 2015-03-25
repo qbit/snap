@@ -17,7 +17,7 @@ set -A sets 'comp' 'game' 'man' 'base'
 set -A xsets 'xbase' 'xfont' 'xserv' 'xshare'
 base_sig='SHA256.sig'
 
-spath=$(dirname -- "${0%/*}")
+spath=$(dirname -- "$(command -v -- "$0")")
 sname="${0##*/}"
 
 function usage {
@@ -131,7 +131,8 @@ function check_update {
 function install_update {
     sver=$1
     tmp_file=$(mktemp)
-    /usr/bin/ftp $FTP_OPTS -M -o $tmp_file https://raw.githubusercontent.com/qbit/snap/${sver}/snap
+    /usr/bin/ftp $FTP_OPTS -M -o $tmp_file \
+		 https://raw.githubusercontent.com/qbit/snap/${sver}/snap
     msg "${white}cp $tmp_file $spath/$sname"
     exit 0
 }
