@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-version=1.0.1
+version=1.0.2
 
 grey="\033[01;30m"
 red="\033[01;31m"
@@ -135,7 +135,8 @@ function install_update {
     tmp_file=$(mktemp)
     /usr/bin/ftp $FTP_OPTS -M -o $tmp_file \
 		 https://raw.githubusercontent.com/qbit/snap/${sver}/snap
-    msg "${white}cp $tmp_file $spath/$sname"
+    cp $tmp_file "$spath/$sname"
+    msg "Installed new version (${sver}) of snap - please re-run!"
     exit 0
 }
 
