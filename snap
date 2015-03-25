@@ -120,17 +120,18 @@ function check_update {
 	msg "snap${white} is up to date!"
     else
 	msg "${white}Update ${green}${LATEST}${white} available for ${bold}snap${white}!"
-	update_dst=$(mktemp)
-	/usr/bin/ftp $FTP_OPTS -M -o $update_dst https://raw.githubusercontent.com/qbit/snap/${LATEST}/snap
-	if [ $INS_UPDATE ]; then
+
+	if [ $INS_UPDATE == true ]; then
 	    msg "installing update.."
-	    install_update $update_dst
+	    install_update $LATEST
 	fi
     fi
 }
 
 function install_update {
-    tmp_file=$1
+    sver=$1
+    tmp_file=$(mktemp)
+    /usr/bin/ftp $FTP_OPTS -M -o $tmp_file https://raw.githubusercontent.com/qbit/snap/${sver}/snap
     msg "${white}cp $tmp_file $spath/$sname"
     exit 0
 }
@@ -310,7 +311,7 @@ while getopts "sSfea:sm:sv:srV:spxR:sAM:shiBknuUb" arg; do
     esac
 done
 
-if [ $CHK_UPDATE ]; then
+if [ $CHK_UPDATE == true ]; then
     check_update
 fi
 
