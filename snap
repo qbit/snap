@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-version=1.0.4
+version=1.0.5
 
 grey="\033[01;30m"
 red="\033[01;31m"
@@ -42,7 +42,7 @@ snap options:
   -B do not backup current kernel.
   -u check for update to snap script.
   -U download new snap script (will replace currently installed version).
-  -b do not run installboot (not implemented).
+  -b device to install bootstrap to.
   -h help.
 
   Examples:
@@ -248,7 +248,7 @@ SETVER=$(uname -r | sed -e 's/\.//')
 VER=$(uname -r)
 CHK_UPDATE=$(get_conf_var 'CHK_UPDATE' || echo 'false')
 INS_UPDATE=$(get_conf_var 'INS_UPDATE' || echo 'false')
-NO_INSTBOOT=$(get_conf_var 'NO_INSTBOOT' || echo 'false')
+INSTBOOT=$(get_conf_var 'INSTBOOT')
 
 MIRROR=$(get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org')
 
@@ -309,7 +309,7 @@ while getopts "sSfea:sm:sv:srV:spxR:sAM:shiBknuUb" arg; do
 	    INS_UPDATE=true
 	    ;;
 	b)
-	    NO_INSTBOOT=true
+	    INSTBOOT=$(echo $OPTARG)
 	    ;;
     esac
 done
@@ -421,11 +421,9 @@ msg "${white}Fetching from: ${green}${URL}"
 	echo "Don't forget to run:\n\tsysmerge -s ${DST}/etc${SETVER}.tgz -x ${DST}/xetc${SETVER}.tgz"
     fi
 
-    if [ $NO_INSTBOOT == false ]; then
-	boot_disk=$(sysctl hw.disknames | cut -d= -f2 | cut -d: -f1)
-	dmesg | grep "root on" | grep -q $boot_disk || error "Can't detect root disk! Manually  run installboot!"
-	msg "Installing bootstrap on ${boot_disk}"
-	installboot -v $boot_disk || error "Something bad happened - check your boot disk!"
+    if [ $INSTBOOT ]; then
+	msg "Installing bootstrap on ${INSTBOOT}"
+	installboot -v $INSTBOOT || error "Something bad happened - check your boot disk!"
     fi
 
     date > ~/.last_snap
