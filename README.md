@@ -46,14 +46,14 @@ Usage
 
 .snaprc options and defaults
 =======
-**INTERACTIVE**: *false*
-**DST**: */tmp/upgrade*
-**MERGE**: *false*
-**NO_X11**: *false*
-**CHK_UPDATE**: *false*
-**INS_UPDATE**: *false*
-**INSTBOOT**: ** (no default, set to disk that has bootstrap installed, sd0 for example)
-**MIRROR**: *ftp3.usa.openbsd.org*
+* **INTERACTIVE**: *false*
+* **DST**: */tmp/upgrade*
+* **MERGE**: *false*
+* **NO_X11**: *false*
+* **CHK_UPDATE**: *false*
+* **INS_UPDATE**: *false*
+* **INSTBOOT**: ** (no default, set to disk that has bootstrap installed, sd0 for example)
+* **MIRROR**: *ftp3.usa.openbsd.org*
 
 Examples
 ========
