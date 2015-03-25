@@ -5,3 +5,4 @@ help:
 
 release:
 	@git tag $(VERSION)
+	@git push --tags
