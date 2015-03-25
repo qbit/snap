@@ -111,7 +111,7 @@ function error {
 
 function check_update {
     R="https://api.github.com/repos/qbit/snap/releases/latest"
-    LATEST=$(/usr/bin/ftp $FTP_OPTS -M -o - $R | \
+    LATEST=$(/usr/bin/ftp $FTP_OPTS -o - $R | \
 		    awk -F, '{for(i=1;i<NF;i++){if(match($i, /tag_name/)){print $i}}}' | \
 		    cut -d: -f 2 | \
 		    sed -e 's/"//g')
@@ -132,7 +132,7 @@ function check_update {
 function install_update {
     sver=$1
     tmp_file=$(mktemp)
-    /usr/bin/ftp $FTP_OPTS -M -o $tmp_file \
+    /usr/bin/ftp $FTP_OPTS -o $tmp_file \
 		 https://raw.githubusercontent.com/qbit/snap/${sver}/snap
     cp $tmp_file "$spath/$sname"
     msg "Installed new version (${sver}) of snap - please re-run!"
