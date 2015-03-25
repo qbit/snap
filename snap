@@ -116,15 +116,17 @@ function check_update {
 		    awk -F, '{for(i=1;i<NF;i++){if(match($i, /tag_name/)){print $i}}}' | \
 		    cut -d: -f 2 | \
 		    sed -e 's/"//g')
-    if [ $version == $LATEST ]; then
-	msg "snap-${version} ${white}is up to date!"
-    else
+    rversion=$(echo $LATEST | sed -e 's/\.//g')
+    lversion=$(echo $version | sed -e 's/\.//g')
+    if [ $rversion -gt $lversion ]; then
 	msg "${white}Update ${green}${LATEST}${white} available for ${bold}snap${white}!"
 
 	if [ $INS_UPDATE == true ]; then
 	    msg "installing update.."
 	    install_update $LATEST
 	fi
+    else
+	msg "snap-${version} ${white}is up to date!"
     fi
 }
 
