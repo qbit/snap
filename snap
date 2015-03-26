@@ -212,11 +212,7 @@ function fetch {
 
 function extract {
     FAIL=0
-    if [ $PV == 1 ]; then
-	pv ${1} | tar -C / -xzphf - || FAIL=1
-    else
-	tar -C / -vxzphf $1 || FAIL=1
-    fi
+    ftp -D Extracting -Vmo - file://${1} | tar -C / -xzphf - || FAIL=1
 
     if [ $FAIL == 1 ]; then
 	error "Extract of ${1} failed, permissions?"
@@ -243,7 +239,6 @@ FTP_OPTS=" -V "
 MACHINE=$(machine)
 MERGE=$(get_conf_var 'MERGE' || echo 'false')
 NO_X11=$(get_conf_var 'NO_X11' || echo 'false')
-PV=0
 SETVER=$(uname -r | sed -e 's/\.//')
 VER=$(uname -r)
 CHK_UPDATE=$(get_conf_var 'CHK_UPDATE' || echo 'false')
@@ -330,10 +325,6 @@ if [ $? == 0 ]; then
     VER='snapshots'
 fi
 
-if [ -x /usr/local/bin/pv ]; then
-    PV=1
-fi
-
 mkd $DST
 
 URL="http://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
@@ -404,13 +395,13 @@ msg "${white}Fetching from: ${green}${URL}"
 
     msg "Extracting sets"
     for set in ${sets[@]}; do
-	extract ${set}${SETVER}.tgz
+	extract ${DST}/${set}${SETVER}.tgz
 
 	if [ "${set}" == "man" ] && [ "${NO_X11}" == "false" ]; then
 	    msg "Extracting xsets ${white} will continue with sets after. ${green}"
 
 	    for xset in ${xsets[@]}; do
-		extract ${xset}${SETVER}.tgz
+		extract ${DST}/${xset}${SETVER}.tgz
 	    done
 	fi
     done
