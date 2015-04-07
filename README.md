@@ -4,6 +4,7 @@ OpenBSD upgrade script.
 
 Changes
 =======
+* 2015-04-07 : Remove pv support as [ftp(1)](http://www.openbsd.org/cgi-bin/man.cgi/OpenBSD-current/man1/ftp.1?query=ftp&arch=i386) can do the same job.
 * 2015-03-25 : Add ability for snap to update itself and run installboot.
 * 2014-09-26 : Pull in the fixes for etc and xetc set removal.
 
