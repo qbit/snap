@@ -43,6 +43,7 @@ snap options:
   -u check for update to snap script.
   -U download new snap script (will replace currently installed version).
   -b device to install bootstrap to.
+  -R reboot after installation.
   -h help.
 
   Examples:
@@ -244,6 +245,7 @@ VER=$(uname -r)
 CHK_UPDATE=$(get_conf_var 'CHK_UPDATE' || echo 'false')
 INS_UPDATE=$(get_conf_var 'INS_UPDATE' || echo 'false')
 INSTBOOT=$(get_conf_var 'INSTBOOT')
+REBOOT=$(get_conf_var 'REBOOT')
 
 MIRROR=$(get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org')
 
@@ -305,6 +307,9 @@ while getopts "sSfea:sm:sv:srV:spxR:sAM:shiBknuUb" arg; do
 	    ;;
 	b)
 	    INSTBOOT=$(echo $OPTARG)
+	    ;;
+	R)
+	    REBOOT=$(echo $OPTARG)
 	    ;;
     esac
 done
@@ -419,4 +424,9 @@ msg "${white}Fetching from: ${green}${URL}"
     fi
 
     date > ~/.last_snap
+
+    if [ $REBOOT ]; then
+	msg "Rebooting"
+	/sbin/oreboot || error "Something really bad happened - Can't reboot!"
+    fi
 )

@@ -44,6 +44,7 @@ Usage
 *  -u check for update to snap script.
 *  -U download new snap script (will replace currently installed version).
 *  -b device to install bootstrap to.
+*  -R reboot after installation.
 *  -h help.
 
 .snaprc options and defaults
@@ -55,6 +56,7 @@ Usage
 * **CHK_UPDATE**: *false*
 * **INS_UPDATE**: *false*
 * **INSTBOOT**: ** (no default, set to disk that has bootstrap installed, sd0 for example)
+* **REBOOT**: ** (no default, setting will cause a reboot once the upgrade is complete.)
 * **MIRROR**: *ftp3.usa.openbsd.org*
 
 Examples
