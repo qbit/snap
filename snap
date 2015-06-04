@@ -303,6 +303,7 @@ while getopts "sSfea:sm:sv:srV:spxR:sAM:shiBknuUb" arg; do
 	    CHK_UPDATE=true
 	    ;;
 	U)
+	    CHK_UPDATE=true
 	    INS_UPDATE=true
 	    ;;
 	b)
