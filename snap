@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-version=1.0.5
+version=1.0.6
 
 grey="\033[01;30m"
 red="\033[01;31m"
