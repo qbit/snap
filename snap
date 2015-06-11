@@ -79,14 +79,6 @@ function get_conf_var {
     fi
 }
 
-
-function mkd {
-    if [ ! -e $1 ]; then
-	msg "mkdir: ${1}"
-	mkdir -p $1
-    fi
-}
-
 function msg {
     if [ $INTERACTIVE == true ]; then
 	echo "${green}${1}${white}"
@@ -321,7 +313,7 @@ if [ $? == 0 ]; then
     VER='snapshots'
 fi
 
-mkd $DST
+mkdir -p -- "$DST" || exit 1
 
 URL="http://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
 
