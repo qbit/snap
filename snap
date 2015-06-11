@@ -86,12 +86,16 @@ function msg {
 }
 
 function error {
-    if [ $INTERACTIVE == true ]; then
+    if [[ $INTERACTIVE == true ]]; then
 	echo "${red}${1}${white}"
+    else
+	echo "$1"
     fi
-    if [ $2 ] && [ $2 == true ]; then
+
+    if [[ $2 == true ]]; then
 	rollback
     fi
+
     exit 1
 }
 
