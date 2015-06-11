@@ -193,28 +193,12 @@ function update_kernel {
 
 function fetch {
     /usr/bin/ftp $FTP_OPTS $1
-    if [ $? == 0 ]; then
-	return 0
-    else
-	return $?
-    fi
+    return $?
 }
 
 function extract {
-    FAIL=0
-    ftp -D Extracting -Vmo - file://${1} | tar -C / -xzphf - || FAIL=1
-
-    if [ $FAIL == 1 ]; then
-	error "Extract of ${1} failed, permissions?"
-    fi
-}
-
-function copy {
-    FAIL=0
-    cp $1 $2 || FAIL=1
-    if [ $FAIL == 1 ]; then
-	error "Can't copy ${1} to ${2}"
-    fi
+    ftp -D Extracting -Vmo - file://${1} | tar -C / -xzphf - \
+		|| error "Failed to extract ${1}"
 }
 
 CONF_FILE=~/.snaprc
@@ -297,6 +281,8 @@ while getopts "sSfesm:sv:srV:spxR:sAM:shiBknuUb" arg; do
 	R)
 	    REBOOT=$(echo $OPTARG)
 	    ;;
+	*)
+	    exit 1
     esac
 done
 
@@ -324,7 +310,7 @@ URL="http://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
 msg "${white}Fetching from: ${green}${URL}"
 
 (
-    cd $DST
+    cd -- "$DST" || exit 1
 
     # first element should be bsd, second should be mp for given kernel names.
     if [ "${MACHINE}" == "armv7" ]; then
