@@ -30,7 +30,6 @@ Usage
 *  -S do not check signatures.
 *  -c specify location of config file (default is ~/.snaprc)
 *  -e just extract sets in DST.
-*  -a <arch> use \<arch\> instead of what 'arch' returns.
 *  -m \<machine\> use <machine> instead of what 'machine' returns.
 *  -v \<version\> used to force snap to use <version> (examples: snapshots or 5.3).
 *  -V \<setversion\> used to force snap to use <setversion> for sets (example: -V 5.3). Note: this will only append 53 to sets, ie base53.tgz.

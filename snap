@@ -29,7 +29,6 @@ snap options:
   -S do not check signatures.
   -c specify location of config file (default is ~/.snaprc)
   -e just extract sets in DST.
-  -a <arch> use <arch> instead of what 'arch' returns.
   -m <machine> use <machine> instead of what 'machine' returns.
   -v <version> used to force snap to use <version> (examples: snapshots or 5.3).
   -V <setversion> used to force snap to use <setversion> for sets (example: -V 5.3). Note: this will only append 53 to sets, ie base53.tgz.
@@ -80,12 +79,6 @@ function get_conf_var {
     fi
 }
 
-function set_conf_var {
-    MAKE=false
-    if [ -e $CONF_FILE ]; then
-	MAKE=true
-    fi
-}
 
 function mkd {
     if [ ! -e $1 ]; then
@@ -115,9 +108,9 @@ function check_update {
     LATEST=$(/usr/bin/ftp $FTP_OPTS -o - $R | \
 		    awk -F, '{for(i=1;i<NF;i++){if(match($i, /tag_name/)){print $i}}}' | \
 		    cut -d: -f 2 | \
-		    sed -e 's/"//g')
-    rversion=$(echo $LATEST | sed -e 's/\.//g')
-    lversion=$(echo $version | sed -e 's/\.//g')
+		    tr -d \")
+    rversion=$(echo $LATEST | tr -d \.)
+    lversion=$(echo $version | tr -d \.)
     if [ $rversion -gt $lversion ]; then
 	msg "${white}Update ${green}${LATEST}${white} available for ${bold}snap${white}!"
 
@@ -228,10 +221,9 @@ function copy {
     fi
 }
 
-ARCH=$( arch -s )
 CONF_FILE=~/.snaprc
 SKIP_SIGN=false
-CPUS=$(sysctl hw.ncpufound | awk -F\= '{print $2}')
+CPUS=$(sysctl -n hw.ncpufound)
 INTERACTIVE=$(get_conf_var 'INTERACTIVE' || echo 'false')
 DST=$(get_conf_var 'DST' || echo '/tmp/upgrade')
 EXTRACT_ONLY=false
@@ -240,7 +232,7 @@ FTP_OPTS=" -V "
 MACHINE=$(machine)
 MERGE=$(get_conf_var 'MERGE' || echo 'false')
 NO_X11=$(get_conf_var 'NO_X11' || echo 'false')
-SETVER=$(uname -r | sed -e 's/\.//')
+SETVER=$(uname -r | tr -d \.)
 VER=$(uname -r)
 CHK_UPDATE=$(get_conf_var 'CHK_UPDATE' || echo 'false')
 INS_UPDATE=$(get_conf_var 'INS_UPDATE' || echo 'false')
@@ -249,7 +241,7 @@ REBOOT=$(get_conf_var 'REBOOT')
 
 MIRROR=$(get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org')
 
-while getopts "sSfea:sm:sv:srV:spxR:sAM:shiBknuUb" arg; do
+while getopts "sSfesm:sv:srV:spxR:sAM:shiBknuUb" arg; do
     case $arg in
 	s)
 	    VER='snapshots'
@@ -259,9 +251,6 @@ while getopts "sSfea:sm:sv:srV:spxR:sAM:shiBknuUb" arg; do
 	    ;;
 	S)
 	    SKIP_SIGN=true
-	    ;;
-	a)
-	    ARCH=$OPTARG
 	    ;;
 	e)
 	    EXTRACT_ONLY=true
@@ -273,7 +262,7 @@ while getopts "sSfea:sm:sv:srV:spxR:sAM:shiBknuUb" arg; do
 	    VER=$OPTARG
 	    ;;
 	V)
-	    SETVER=$( echo $OPTARG | sed -e 's/\.//' )
+	    SETVER=$(echo $OPTARG | tr -d \.)
 	    ;;
 	x)
 	    NO_X11=true
