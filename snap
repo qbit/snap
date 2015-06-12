@@ -69,7 +69,7 @@ EOF
 function get_conf_var {
     RET=''
     if [ -e $CONF_FILE ]; then
-	RET=$( grep $1 $CONF_FILE | awk -F\: '{print $2}' )
+	RET=$( grep $1 $CONF_FILE | awk -F : '{print $2}' )
     fi
 
     if [ "${RET}X" == "X" ]; then
@@ -102,7 +102,7 @@ function error {
 function check_update {
     R="https://api.github.com/repos/qbit/snap/releases/latest"
     LATEST=$(/usr/bin/ftp $FTP_OPTS -o - $R | \
-		    awk -F, '{for(i=1;i<NF;i++){if(match($i, /tag_name/)){print $i}}}' | \
+		    awk -F , '{for(i=1;i<NF;i++){if(match($i, /tag_name/)){print $i}}}' | \
 		    cut -d: -f 2 | \
 		    tr -d \")
     rversion=$(echo $LATEST | tr -d \.)
@@ -314,7 +314,7 @@ msg "${white}Fetching from: ${green}${URL}"
 
     # first element should be bsd, second should be mp for given kernel names.
     if [ "${MACHINE}" == "armv7" ]; then
-	TYPE=$(uname -v | awk -F\- '{print $NF}' | cut -d# -f1)
+	TYPE=$(uname -v | awk -F - '{print $NF}' | cut -d# -f1)
 	# Currently there is no bsd.mp
 	#set -A bsds "bsd.${TYPE}" "bsd.mp.${TYPE}" "bsd.rd.${TYPE}" "bsd.${TYPE}.umg"
 	set -A bsds "bsd.${TYPE}" "" "bsd.rd.${TYPE}" "bsd.${TYPE}.umg"
