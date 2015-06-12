@@ -87,9 +87,9 @@ function msg {
 
 function error {
     if [[ $INTERACTIVE == true ]]; then
-	echo "${red}${1}${white}"
+	>&2 echo "${red}${1}${white}"
     else
-	echo "$1"
+	>&2 echo "${sname}: $1"
     fi
 
     if [[ $2 == true ]]; then
@@ -291,7 +291,7 @@ if [ $CHK_UPDATE == true ]; then
     exit 0
 fi
 
-[[ $(id -u) -ne 0 ]] && error "${sname}: need root privileges"
+[[ $(id -u) -ne 0 ]] && error "need root privileges"
 
 if [ -e ~/.last_snap ]; then
     msg "last snap run: ${white}$(cat ~/.last_snap)"
