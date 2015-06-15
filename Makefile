@@ -15,5 +15,3 @@ install:
 	install -d $(DESTDIR)$(PREFIX)/bin
 	install -m 755 snap $(DESTDIR)$(PREFIX)/bin/snap
 
-uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/bin/snap
