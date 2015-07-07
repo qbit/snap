@@ -61,6 +61,7 @@ snap options:
     MERGE:true
     MIRROR:ftp3.usa.openbsd.org
     NO_X11:true
+    FTP_OPTS:-C -V
 
 EOF
     exit 0
@@ -192,13 +193,26 @@ function update_kernel {
 }
 
 function fetch {
-    /usr/bin/ftp $FTP_OPTS $1
-    return $?
+    DF=$(echo $1 | awk -F/ '{print $NF}')
+    TDF="${DF}.out"
+    R=0
+
+    # this check may cause signature issues.. if old files exist in
+    # the DEST directory.
+    if [ ! -e $DF ]; then
+	/usr/bin/ftp $FTP_OPTS -o $TDF $1
+	R=$?
+
+	# move the tmp file to actual file name so we can use -C
+	mv $TDF $DF
+    fi
+
+    return $R
 }
 
 function extract {
     ftp -D Extracting -Vmo - file://${1} | tar -C / -xzphf - \
-		|| error "Failed to extract ${1}"
+	|| error "Failed to extract ${1}"
 }
 
 CONF_FILE=~/.snaprc
@@ -208,7 +222,7 @@ INTERACTIVE=$(get_conf_var 'INTERACTIVE' || echo 'false')
 DST=$(get_conf_var 'DST' || echo '/tmp/upgrade')
 EXTRACT_ONLY=false
 KERNEL_ONLY=false
-FTP_OPTS=" -V "
+FTP_OPTS=$(get_conf_var 'FTP_OPTS' || echo " -V ")
 MACHINE=$(machine)
 MERGE=$(get_conf_var 'MERGE' || echo 'false')
 NO_X11=$(get_conf_var 'NO_X11' || echo 'false')
