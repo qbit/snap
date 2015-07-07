@@ -317,7 +317,11 @@ msg "${white}Fetching from: ${green}${URL}"
 	TYPE=$(uname -v | awk -F - '{print $NF}' | cut -d# -f1)
 	# Currently there is no bsd.mp
 	#set -A bsds "bsd.${TYPE}" "bsd.mp.${TYPE}" "bsd.rd.${TYPE}" "bsd.${TYPE}.umg"
-	set -A bsds "bsd.${TYPE}" "" "bsd.rd.${TYPE}" "bsd.${TYPE}.umg"
+	if [ -e /bsd.${TYPE} ]; then
+	    set -A bsds "bsd.${TYPE}" "" "bsd.rd.${TYPE}" "bsd.${TYPE}.umg"
+	else
+	    set -A bsds 'bsd' '' 'bsd.rd' 'bsd.umg'
+	fi
     else
 	set -A bsds 'bsd' 'bsd.mp' 'bsd.rd'
     fi
