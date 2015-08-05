@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-version=1.0.8
+version=1.0.10
 
 grey="\033[01;30m"
 red="\033[01;31m"
@@ -102,7 +102,7 @@ function error {
 
 function check_update {
     R="https://api.github.com/repos/qbit/snap/releases/latest"
-    LATEST=$(/usr/bin/ftp $FTP_OPTS -o - $R | \
+    LATEST=$(/usr/bin/ftp -o - $R | \
 		    awk -F , '{for(i=1;i<NF;i++){if(match($i, /tag_name/)){print $i}}}' | \
 		    cut -d: -f 2 | \
 		    tr -d \")
