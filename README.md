@@ -23,6 +23,30 @@ Installation
 # make install
 ```
 
+Verifying an Installation
+=========================
+
+`snap` now can be verified via [signify(1)](http://www.openbsd.org/cgi-bin/man.cgi?query=signify&apropos=0&sektion=0&manpath=OpenBSD+Current&arch=i386&format=html)!
+
+The public key is as follows:
+```
+untrusted comment: github.com/qbit/snap public key
+RWQkqrbMjoywaLwJQf45TjtCLgtFPSEO7v/TBf01WRZjvl8NSy6rJ6Fe
+```
+
+Verification of the signature can be done with the following command (once the above key is added to `/etc/signify/snap.pub`):
+
+```
+signify -C -p /etc/signify/snap.pub -x SHA256.sig snap
+```
+
+But Aaron, how do I know I have the correct public key? Mirrors.
+
+The key is also available on the following locations:
+[deftly.net](https://deftly.net/snap.pub)
+[cobug.org](https://cobug.org/snap.pub)
+
+
 Usage
 =====
 *  -s force snap to use snapshots.
