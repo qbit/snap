@@ -43,8 +43,9 @@ signify -C -p /etc/signify/snap.pub -x SHA256.sig snap
 But Aaron, how do I know I have the correct public key? Mirrors.
 
 The key is also available on the following locations:
-[deftly.net](https://deftly.net/snap.pub)
-[cobug.org](https://cobug.org/snap.pub)
+- [deftly.net](https://deftly.net/snap.pub)
+- [cobug.org](https://cobug.org/snap.pub)
+- [keybase.io signed gist](https://gist.github.com/qbit/b0ed7d7cb6bac6b5afaf) signed using [my account](https://keybase.io/qbit)
 
 
 Usage
