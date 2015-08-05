@@ -9,7 +9,7 @@ help:
 
 sign:
 	@sha256 snap > SHA256
-	@signify -S -s ~/signify/snap.sec -m SHA256 -x SHA256.sig -c "signature from snap secret key"
+	@signify -S -s ~/signify/snap.sec -m SHA256 -x SHA256.sig
 	@cat SHA256 >> SHA256.sig
 
 verify:
