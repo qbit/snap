@@ -231,11 +231,11 @@ VER=$(uname -r)
 CHK_UPDATE=$(get_conf_var 'CHK_UPDATE' || echo 'false')
 INS_UPDATE=$(get_conf_var 'INS_UPDATE' || echo 'false')
 INSTBOOT=$(get_conf_var 'INSTBOOT')
-REBOOT=$(get_conf_var 'REBOOT')
+REBOOT=$(get_conf_var 'REBOOT' || echo 'false')
 
 MIRROR=$(get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org')
 
-while getopts "sSfesm:sv:srV:spxR:sAM:shiBknuUb" arg; do
+while getopts "sSfesm:sv:srV:spxRsAM:shiBknuUb" arg; do
     case $arg in
 	s)
 	    VER='snapshots'
@@ -293,7 +293,7 @@ while getopts "sSfesm:sv:srV:spxR:sAM:shiBknuUb" arg; do
 	    INSTBOOT=$(echo $OPTARG)
 	    ;;
 	R)
-	    REBOOT=$(echo $OPTARG)
+	    REBOOT=true
 	    ;;
 	*)
 	    exit 1
@@ -415,7 +415,7 @@ msg "${white}Fetching from: ${green}${URL}"
 
     date > ~/.last_snap
 
-    if [ $REBOOT ]; then
+    if [ $REBOOT == true ]; then
 	msg "Rebooting"
 	/sbin/oreboot || error "Something really bad happened - Can't reboot!"
     fi
