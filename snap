@@ -231,26 +231,60 @@ VER=$(uname -r)
 CHK_UPDATE=$(get_conf_var 'CHK_UPDATE' || echo 'false')
 INS_UPDATE=$(get_conf_var 'INS_UPDATE' || echo 'false')
 INSTBOOT=$(get_conf_var 'INSTBOOT')
-REBOOT=$(get_conf_var 'REBOOT')
+REBOOT=$(get_conf_var 'REBOOT' || echo 'false')
 
 MIRROR=$(get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org')
 
-while getopts "sSfesm:sv:srV:spxR:sAM:shiBknuUb" arg; do
+while getopts "b:Bc:ehikm:M:nrRsSuUv:V:x" arg; do
     case $arg in
-	s)
-	    VER='snapshots'
+	b)
+	    INSTBOOT=$OPTARG
+	    ;;
+	B)
+	    NO_KBACKUPS=true
 	    ;;
 	c)
 	    CONF_FILE=$OPTARG
 	    ;;
-	S)
-	    SKIP_SIGN=true
-	    ;;
 	e)
 	    EXTRACT_ONLY=true
 	    ;;
+	h)
+	    usage
+	    ;;
+	i)
+	    INTERACTIVE=true
+	    ;;
+	k)
+	    KERNEL_ONLY=true
+	    ;;
 	m)
 	    MACHINE=$OPTARG
+	    ;;
+	M)
+	    MIRROR=$OPTARG
+	    ;;
+	n)
+	    FORCE_MP=true
+	    ;;
+	r)
+	    MERGE=true
+	    ;;
+	R)
+	    REBOOT=true
+	    ;;
+	s)
+	    VER='snapshots'
+	    ;;
+	S)
+	    SKIP_SIGN=true
+	    ;;
+	u)
+	    CHK_UPDATE=true
+	    ;;
+	U)
+	    CHK_UPDATE=true
+	    INS_UPDATE=true
 	    ;;
 	v)
 	    VER=$OPTARG
@@ -260,40 +294,6 @@ while getopts "sSfesm:sv:srV:spxR:sAM:shiBknuUb" arg; do
 	    ;;
 	x)
 	    NO_X11=true
-	    ;;
-	r)
-	    MERGE=true
-	    ;;
-	M)
-	    MIRROR=$OPTARG
-	    ;;
-	h)
-	    usage
-	    ;;
-	i)
-	    INTERACTIVE=true
-	    ;;
-	B)
-	    NO_KBACKUPS=true
-	    ;;
-	k)
-	    KERNEL_ONLY=true
-	    ;;
-	n)
-	    FORCE_MP=true
-	    ;;
-	u)
-	    CHK_UPDATE=true
-	    ;;
-	U)
-	    CHK_UPDATE=true
-	    INS_UPDATE=true
-	    ;;
-	b)
-	    INSTBOOT=$(echo $OPTARG)
-	    ;;
-	R)
-	    REBOOT=$(echo $OPTARG)
 	    ;;
 	*)
 	    exit 1
@@ -415,7 +415,7 @@ msg "${white}Fetching from: ${green}${URL}"
 
     date > ~/.last_snap
 
-    if [ $REBOOT ]; then
+    if [ $REBOOT == true ]; then
 	msg "Rebooting"
 	/sbin/oreboot || error "Something really bad happened - Can't reboot!"
     fi
