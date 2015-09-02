@@ -70,7 +70,7 @@ EOF
 function get_conf_var {
     RET=''
     if [ -e $CONF_FILE ]; then
-	RET=$( grep $1 $CONF_FILE | awk -F : '{print $2}' )
+	RET=$( grep $1 $CONF_FILE | awk -F : '{if ($1 !~ /^#/) {print $2}}' )
     fi
 
     if [ "${RET}X" == "X" ]; then
