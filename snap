@@ -405,7 +405,7 @@ msg "${white}Fetching from: ${green}${URL}"
     if [ $MERGE == true ]; then
 	sysmerge ${MERG_OPT} || error "Failed to sysmerge!"
     else
-	echo "Don't forget to run:\n\tsysmerge -s ${DST}/etc${SETVER}.tgz -x ${DST}/xetc${SETVER}.tgz"
+	echo "Don't forget to run sysmerge!"
     fi
 
     if [ $INSTBOOT ]; then
