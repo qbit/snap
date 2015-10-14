@@ -117,9 +117,9 @@ function check_update {
 function install_update {
     sver=$1
     tmp_file=$(mktemp)
-    /usr/bin/ftp $FTP_OPTS -o $tmp_file \
-		 https://raw.githubusercontent.com/qbit/snap/${sver}/snap
-    cp $tmp_file "$spath/$sname"
+    /usr/bin/ftp $FTP_OPTS -o "$tmp_file" \
+		 "https://raw.githubusercontent.com/qbit/snap/${sver}/snap"
+    cp "$tmp_file" "$spath/$sname"
     msg "Installed new version (${sver}) of snap - please re-run!"
     exit 0
 }
@@ -205,7 +205,7 @@ function fetch {
 }
 
 function extract {
-    ftp -D Extracting -Vmo - file://${1} | tar -C / -xzphf - \
+    ftp -D Extracting -Vmo - "file://${1}" | tar -C / -xzphf - \
 	|| error "Failed to extract ${1}"
 }
 
@@ -344,7 +344,7 @@ msg "${white}Fetching from: ${green}${URL}"
 
     if [ $EXTRACT_ONLY == false ]; then
 	msg "Fetching bsds"
-	for bsd in ${bsds[@]}; do
+	for bsd in "${bsds[@]}"; do
 	    fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}"
 	done
 
@@ -367,13 +367,13 @@ msg "${white}Fetching from: ${green}${URL}"
 	fi
 
 	msg "Fetching sets"
-	for set in ${sets[@]}; do
+	for set in "${sets[@]}"; do
 	    fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example 5.2" true
 	done
 
 	if [ "${NO_X11}" == "false" ]; then
 	    msg "Fetching xsets"
-	    for set in ${xsets[@]}; do
+	    for set in "${xsets[@]}"; do
 		fetch "${URL}/${set}${SETVER}.tgz" || error "Perhaps you need to specify -V to set version. Example -V 5.2" true
 	    done
 	fi
@@ -384,14 +384,14 @@ msg "${white}Fetching from: ${green}${URL}"
     fi
 
     msg "Extracting sets"
-    for set in ${sets[@]}; do
-	extract ${DST}/${set}${SETVER}.tgz
+    for set in "${sets[@]}"; do
+	extract "${DST}/${set}${SETVER}.tgz"
 
 	if [ "${set}" == "man" ] && [ "${NO_X11}" == "false" ]; then
 	    msg "Extracting xsets ${white} will continue with sets after. ${green}"
 
-	    for xset in ${xsets[@]}; do
-		extract ${DST}/${xset}${SETVER}.tgz
+	    for xset in "${xsets[@]}"; do
+		extract "${DST}/${xset}${SETVER}.tgz"
 	    done
 	fi
     done
