@@ -137,7 +137,7 @@ function backup {
     ${bold}/bsd => /obsd
     /bsd.rd => /obsd.rd
     /sbin/reboot => /sbin/oreboot${green}"
-  fi
+    fi
 }
 
 function rollback {
@@ -153,7 +153,7 @@ function rollback {
     ${bold}/bsd => /obsd
     /bsd.rd => /obsd.rd
     /sbin/reboot => /sbin/oreboot${green}"
-  fi
+    fi
 
 }
 
@@ -183,7 +183,7 @@ function update_kernel {
     else
 	msg "Set primary kernel to ${KERNEL}:
     ${KERNEL} => /bsd"
-  fi
+    fi
 }
 
 function fetch {
