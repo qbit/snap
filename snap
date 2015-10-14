@@ -2,15 +2,9 @@
 
 version=1.0.10
 
-grey="\033[01;30m"
 red="\033[01;31m"
 green="\033[01;32m"
-yellow="\033[01;33m"
-blue="\033[01;34m"
-magenta="\033[01;35m"
-cyan="\033[01;35m"
 bold="\033[01;39m"
-
 white="\033[0m"
 
 set -A sets 'comp' 'game' 'man' 'base'
