@@ -161,13 +161,17 @@ function verisigs {
     KEY=/etc/signify/openbsd-${SETVER}-base.pub
     VALID=true
 
-    for i in $@; do
-	signify -V -e -p ${KEY} -x SHA256.sig -m - | sha256 -C - ${i} \
-	    || VALID=false
-    done
+    if [ -f "$KEY" ]; then
+	for i in "$@"; do
+	    signify -V -e -p ${KEY} -x SHA256.sig -m - | sha256 -C - ${i} \
+		|| VALID=false
+	done
 
-    if [ $VALID == false ]; then
-	error "Invalid signature found! They are after you!" true
+	if [ $VALID == false ]; then
+	    error "Invalid signature found! They are after you!" true
+	fi
+    else
+	error "No pub key found for this release! (${KEY})"
     fi
 }
 
