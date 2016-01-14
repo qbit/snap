@@ -26,9 +26,19 @@ Installation
 Verifying an Installation
 =========================
 
+**WARNING: I have had to create new keys for signing snap. Please update your pub key!**
+
 `snap` now can be verified via [signify(1)](http://www.openbsd.org/cgi-bin/man.cgi?query=signify&apropos=0&sektion=0&manpath=OpenBSD+Current&arch=i386&format=html)!
 
 The public key is as follows:
+
+```
+untrusted comment: github.com/qbit/snap public key
+RWTKOAnI3kqGqY/1ungBemfzkDj4ImXuybf4sDZcCrNJywffIRDkK1qF
+```
+
+The old public key is:
+
 ```
 untrusted comment: github.com/qbit/snap public key
 RWQkqrbMjoywaLwJQf45TjtCLgtFPSEO7v/TBf01WRZjvl8NSy6rJ6Fe
@@ -45,6 +55,11 @@ But Aaron, how do I know I have the correct public key? Mirrors.
 The key is also available on the following locations:
 - [deftly.net](https://deftly.net/snap.pub)
 - [cobug.org](https://cobug.org/snap.pub)
+- [keybase.io signed gist](https://gist.github.com/qbit/1c4884883c38c79ce24d) signed using [my account](https://keybase.io/qbit)
+
+Old pub key:
+- [deftly.net](https://deftly.net/snap.pub.old)
+- [cobug.org](https://cobug.org/snap.pub.old)
 - [keybase.io signed gist](https://gist.github.com/qbit/b0ed7d7cb6bac6b5afaf) signed using [my account](https://keybase.io/qbit)
 
 
