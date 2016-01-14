@@ -130,6 +130,10 @@ function backup {
     cp /bsd.rd /obsd.rd || FAIL=1
     cp /sbin/reboot /sbin/oreboot || FAIL=1
 
+    if [ -e /bsd.sp ]; then
+	cp /bsd.sp /obsd.sp || FAIL=1
+    fi
+
     if [ $FAIL == 1 ]; then
 	error "Failed to backup"
     else
@@ -144,6 +148,11 @@ function rollback {
     FAIL=0
     cp /obsd /bsd || FAIL=1
     cp /obsd.rd /bsd.rd || FAIL=1
+
+    if [ -e /obsd.sp ]; then
+	cp /obsd.sp /bsd.sp || FAIL=1
+    fi
+
     cp /sbin/oreboot /sbin/reboot || FAIL=1
 
     if [ $FAIL == 1 ]; then
@@ -182,6 +191,11 @@ function update_kernel {
     fi
     cp ${KERNEL} /bsd || FAIL=1
     cp ${RD} /bsd.rd || FAIL=1
+
+    if [ "${KERNEL}" == "bsd.mp" ]; then
+	cp bsd /bsd.sp || FAIL=1
+    fi
+
     if [ $FAIL == 1 ]; then
 	error "Failed to copy new kernel"
     else
