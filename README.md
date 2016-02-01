@@ -62,17 +62,16 @@ Old pub key:
 - [cobug.org](https://cobug.org/snap.pub.old)
 - [keybase.io signed gist](https://gist.github.com/qbit/b0ed7d7cb6bac6b5afaf) signed using [my account](https://keybase.io/qbit)
 
-
 Usage
 =====
 *  -s force snap to use snapshots.
 *  -S do not check signatures.
 *  -c specify location of config file (default is ~/.snaprc)
 *  -e just extract sets in DST.
-*  -m \<machine\> use <machine> instead of what 'machine' returns.
-*  -v \<version\> used to force snap to use <version> (examples: snapshots or 5.3).
-*  -V \<setversion\> used to force snap to use <setversion> for sets (example: -V 5.3). Note: this will only append 53 to sets, ie base53.tgz.
-*  -r run sysmerge after extracting {x}sets.
+*  -m \<machine\> use \<machine\> instead of what 'machine' returns.
+*  -v \<version\> used to force snap to use \<version\> (examples: snapshots or 5.3).
+*  -V \<setversion\> used to force snap to use \<setversion\> for sets (example: -V 5.3). Note: this will only append 53 to sets, ie base53.tgz.
+*  -r run sysmerge after extracting {x}sets. (May dump core if the snapshots have introduced ABI changes. Not recommended.)
 *  -x do not extract x11 sets.
 *  -M specify a mirror to use (example: " -M ftp3.usa.openbsd.org")
 *  -i interactive with colors.
