@@ -18,8 +18,10 @@ bump:
 
 release: bump sign
 	VERSION=$$(awk -F= '/^version/ {print $$2}' snap); \
-	echo git tag $${VERSION}; \
-	echo git push --tags
+	git add snap SHA256 SHA256.sig; \
+	git commit -m '$${VERSION}'; \
+	git tag $${VERSION}; \
+	git push --tags
 
 install:
 	install -d $(DESTDIR)$(PREFIX)/bin
