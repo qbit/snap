@@ -1,6 +1,7 @@
 #!/bin/ksh
 
-version=1.0.12
+# 1.0.12
+version=master
 
 red="\033[01;31m"
 green="\033[01;32m"
@@ -29,6 +30,7 @@ snap options:
   -r run sysmerge after extracting {x}sets. (May dump core if the snapshots have introduced ABI changes. Not recommended.)
   -x do not extract x11 sets.
   -M specify a mirror to use (example: " -M ftp3.usa.openbsd.org")
+  -I [full path to SHA256.sig file] verify integrity of snap.
   -i interactive with colors.
   -n force using bsd.mp as bsd.
   -k only install kernels and exit.
@@ -166,6 +168,32 @@ function rollback {
 
 }
 
+function check_integ {
+    key=${key:-/etc/signify/snap.pub}
+    file=${sname}
+
+    # signify doesn't like leading ./'s
+    #file=${file:S/\.\///}
+
+    if [ ! -f "${key}" ]; then
+	error "No public key (${key}).\nSee https://github.com/qbit/snap for more info!"
+    fi
+
+    if [ ! -f "${INTEG_SIG_FILE}" ]; then
+	tmp_file=$(mktemp)
+	/usr/bin/ftp $FTP_OPTS -o "$tmp_file" \
+		     "https://raw.githubusercontent.com/qbit/snap/${version}/SHA256.sig"
+	INTEG_SIG_FILE=${tmp_file}
+    fi
+
+    (
+        # we need to be in the same directory as snap to verify, as that is what
+        # is in SHA256.sig
+        cd $spath && \
+        signify -C -p "${key}" -x "${INTEG_SIG_FILE}" "${file}"
+    )
+}
+
 function verisigs {
     KEY=/etc/signify/openbsd-${SETVER}-base.pub
     VALID=true
@@ -240,6 +268,7 @@ MERGE=$(get_conf_var 'MERGE' || echo 'false')
 NO_X11=$(get_conf_var 'NO_X11' || echo 'false')
 SETVER=$(uname -r | tr -d \.)
 VER=$(uname -r)
+CHK_INTEG=false
 CHK_UPDATE=$(get_conf_var 'CHK_UPDATE' || echo 'false')
 INS_UPDATE=$(get_conf_var 'INS_UPDATE' || echo 'false')
 INSTBOOT=$(get_conf_var 'INSTBOOT')
@@ -247,7 +276,7 @@ REBOOT=$(get_conf_var 'REBOOT' || echo 'false')
 
 MIRROR=$(get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org')
 
-while getopts "b:Bc:ehikm:M:nrRsSuUv:V:x" arg; do
+while getopts "b:Bc:ehiIkm:M:nrRsSuUv:V:x" arg; do
     case $arg in
 	b)
 	    INSTBOOT=$OPTARG
@@ -266,6 +295,13 @@ while getopts "b:Bc:ehikm:M:nrRsSuUv:V:x" arg; do
 	    ;;
 	i)
 	    INTERACTIVE=true
+	    ;;
+	I)
+	    CHK_INTEG=true
+	    shift $((${OPTIND}-1))
+	    INTEG_SIG_FILE=$@
+	    INTEG_SIG_FILE=${INTEG_SIG_FILE:-SHA256.sig}
+	    OPTIND=1
 	    ;;
 	k)
 	    KERNEL_ONLY=true
@@ -311,6 +347,11 @@ while getopts "b:Bc:ehikm:M:nrRsSuUv:V:x" arg; do
 	    exit 1
     esac
 done
+
+if [ $CHK_INTEG == true ]; then
+    check_integ
+    exit 0
+fi 
 
 if [ $CHK_UPDATE == true ]; then
     check_update

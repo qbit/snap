@@ -34,10 +34,16 @@ The public key is as follows:
 
 ```
 untrusted comment: github.com/qbit/snap public key
-RWTKOAnI3kqGqY/1ungBemfzkDj4ImXuybf4sDZcCrNJywffIRDkK1qF
+RWQVGN6sUjQQA5uYpANGLLKQMAERZ43otLePFSVqNFGGtf/qBez7G1WU
 ```
 
 The old public key is:
+```
+untrusted comment: github.com/qbit/snap public key
+RWTKOAnI3kqGqY/1ungBemfzkDj4ImXuybf4sDZcCrNJywffIRDkK1qF
+```
+
+The old old public key is:
 
 ```
 untrusted comment: github.com/qbit/snap public key
@@ -47,19 +53,32 @@ RWQkqrbMjoywaLwJQf45TjtCLgtFPSEO7v/TBf01WRZjvl8NSy6rJ6Fe
 Verification of the signature can be done with the following command (once the above key is added to `/etc/signify/snap.pub`):
 
 ```
+snap -I
+```
+
+or
+
+```
 signify -C -p /etc/signify/snap.pub -x SHA256.sig snap
 ```
 
 But Aaron, how do I know I have the correct public key? Mirrors.
 
 The key is also available on the following locations:
+
+Pub Key:
 - [deftly.net](https://deftly.net/snap.pub)
 - [cobug.org](https://cobug.org/snap.pub)
-- [keybase.io signed gist](https://gist.github.com/qbit/1c4884883c38c79ce24d) signed using [my account](https://keybase.io/qbit)
+- [keybase.io signed gist](https://gist.github.com/qbit/21b3bfc88f50ebf5bd2a) signed using [my account](https://keybase.io/qbit)
 
 Old pub key:
 - [deftly.net](https://deftly.net/snap.pub.old)
 - [cobug.org](https://cobug.org/snap.pub.old)
+- [keybase.io signed gist](https://gist.github.com/qbit/1c4884883c38c79ce24d) signed using [my account](https://keybase.io/qbit)
+
+Old old pub key:
+- [deftly.net](https://deftly.net/snap.pub.old.old)
+- [cobug.org](https://cobug.org/snap.pub.old.old)
 - [keybase.io signed gist](https://gist.github.com/qbit/b0ed7d7cb6bac6b5afaf) signed using [my account](https://keybase.io/qbit)
 
 Usage
@@ -74,6 +93,7 @@ Usage
 *  -r run sysmerge after extracting {x}sets. (May dump core if the snapshots have introduced ABI changes. Not recommended.)
 *  -x do not extract x11 sets.
 *  -M specify a mirror to use (example: " -M ftp3.usa.openbsd.org")
+*  -I [full path to SHA256.sig file] verify integrity of snap.
 *  -i interactive with colors.
 *  -n force using bsd.mp as bsd.
 *  -k only install kernels and exit.

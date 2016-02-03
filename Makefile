@@ -1,5 +1,4 @@
-VERSION=`awk -F= '/^version/ {print $2}' snap | cut -d= -f2`
-
+#VERSION=`awk -F= '/^version/ {print $$2}' snap`
 PREFIX ?= /usr/local
 
 help:
@@ -15,9 +14,13 @@ sign:
 verify:
 	@signify -C -p /etc/signify/snap.pub -x SHA256.sig snap
 
-release:
-	@git tag $(VERSION)
-	@git push --tags
+bump:
+	@vi ./snap
+
+release: bump sign
+	VERSION=$$(awk -F= '/^version/ {print $$2}' snap); \
+	echo git tag $${VERSION}; \
+	echo git push --tags
 
 install:
 	install -d $(DESTDIR)$(PREFIX)/bin
