@@ -97,22 +97,29 @@ function error {
 }
 
 function check_update {
-    R="https://api.github.com/repos/qbit/snap/releases/latest"
-    LATEST=$(/usr/bin/ftp -o - $R | \
-		    awk -F , '{for(i=1;i<NF;i++){if(match($i, /tag_name/)){print $i}}}' | \
-		    cut -d: -f 2 | \
-		    tr -d \")
-    rversion=$(echo $LATEST | tr -d \.)
-    lversion=$(echo $version | tr -d \.)
-    if [ $rversion -gt $lversion ]; then
-	msg "${white}Update ${green}${LATEST}${white} available for ${bold}snap${white}!"
+    if [ "${version}" != "master" ]; then
+	R="https://api.github.com/repos/qbit/snap/releases/latest"
+	LATEST=$(/usr/bin/ftp -o - $R | \
+			awk -F , '{for(i=1;i<NF;i++){if(match($i, /tag_name/)){print $i}}}' | \
+			cut -d: -f 2 | \
+			tr -d \")
+	rversion=$(echo $LATEST | tr -d \.)
+	lversion=$(echo $version | tr -d \.)
+	if [ $rversion -gt $lversion ]; then
+	    msg "${white}Update ${green}${LATEST}${white} available for ${bold}snap${white}!"
 
+	    if [ $INS_UPDATE == true ]; then
+		msg "installing update.."
+		install_update $LATEST
+	    fi
+	else
+	    msg "snap-${version} ${white}is up to date!"
+	fi
+    else
 	if [ $INS_UPDATE == true ]; then
 	    msg "installing update.."
 	    install_update $LATEST
 	fi
-    else
-	msg "snap-${version} ${white}is up to date!"
     fi
 }
 
@@ -190,7 +197,7 @@ function check_integ {
         # we need to be in the same directory as snap to verify, as that is what
         # is in SHA256.sig
         cd $spath && \
-        signify -C -p "${key}" -x "${INTEG_SIG_FILE}" "${file}"
+	    signify -C -p "${key}" -x "${INTEG_SIG_FILE}" "${file}"
     )
 }
 
