@@ -118,7 +118,7 @@ function check_update {
     else
 	if [ $INS_UPDATE == true ]; then
 	    msg "installing update.."
-	    install_update $LATEST
+	    install_update $version
 	fi
     fi
 }
