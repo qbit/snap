@@ -1,4 +1,3 @@
-#VERSION=`awk -F= '/^version/ {print $$2}' snap`
 PREFIX ?= /usr/local
 
 help:
