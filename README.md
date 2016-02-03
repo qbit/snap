@@ -4,12 +4,14 @@ OpenBSD upgrade script.
 
 Changes
 =======
+* 2016-02-03 : Add ability for snap to verify its integrity via [signify(1)](http://www.openbsd.org/cgi-bin/man.cgi?query=signify&apropos=0&sektion=0&manpath=OpenBSD+Current&arch=i386&format=html)!
 * 2015-04-07 : Remove pv support as [ftp(1)](http://www.openbsd.org/cgi-bin/man.cgi/OpenBSD-current/man1/ftp.1?query=ftp&arch=i386) can do the same job.
 * 2015-03-25 : Add ability for snap to update itself and run installboot.
 * 2014-09-26 : Pull in the fixes for etc and xetc set removal.
 
 Features
 ========
+* Verify integrity of the snap script.
 * Upgrade to a release, or to snaps.
 * Store config options in an rc file.
 * Auto # cpu detection.
