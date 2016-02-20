@@ -463,6 +463,7 @@ msg "${white}Fetching from: ${green}${URL}"
     done
 
     if [ $MERGE == true ]; then
+	msg "Running sysmerge"
 	sysmerge ${MERG_OPT} || error "Failed to sysmerge!"
     else
 	echo "Don't forget to run sysmerge!"
