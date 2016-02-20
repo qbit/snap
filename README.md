@@ -45,6 +45,7 @@ Usage
 =======
 * **INTERACTIVE**: *false*
 * **DST**: */tmp/upgrade*
+* **EXTRACT_ONLY**: *false*
 * **FTP_OPTS**: *-V*
 * **MERGE**: *false*
 * **NO_X11**: *false*
