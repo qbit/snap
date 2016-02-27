@@ -360,7 +360,7 @@ done
 if [ $CHK_INTEG == true ]; then
     check_integ
     exit 0
-fi 
+fi
 
 if [ $CHK_UPDATE == true ]; then
     check_update
@@ -480,7 +480,7 @@ msg "${white}Fetching from: ${green}${URL}"
 
     if [ $USE_BUILDINFO ]; then
 	awk -F- '{print $2}' "$build_info" | sed 's/^ //' > ~/.last_snap
-    else 
+    else
 	date > ~/.last_snap
     fi
 
