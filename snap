@@ -369,10 +369,6 @@ fi
 
 [[ $(id -u) -ne 0 ]] && error "need root privileges"
 
-if [ -e ~/.last_snap ]; then
-    msg "last snap: ${white}$(cat ~/.last_snap)"
-fi
-
 kern_ver=$(sysctl kern.version | grep -oE "\-(current|beta)")
 if [ $? == 0 ]; then
     msg "kern.version: ${white}reporting as $kern_ver"
@@ -409,6 +405,17 @@ msg "${white}Fetching from: ${green}${URL}"
     fi
 
     fetch "${URL}/${build_info}" || USE_BUILDINFO=false
+
+    if [ -e ~/.last_snap ]; then
+	last_snap=$(cat ~/.last_snap)
+	msg "last snap: ${white}${last_snap}"
+	if [ $USE_BUILDINFO ]; then
+	    current_snap=$(awk -F- '{print $2}' "$build_info" | sed 's/^ //')
+	    if [ "${last_snap}" == "$current_snap" ]; then
+		error "No new snaps available, mirror has: ${current_snap}"
+	    fi
+	fi
+    fi
 
     #TODO mount msdos volume and copy umg files.
 
