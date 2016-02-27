@@ -11,6 +11,7 @@ white="\033[0m"
 set -A sets 'comp' 'game' 'man' 'base'
 set -A xsets 'xbase' 'xfont' 'xserv' 'xshare'
 base_sig='SHA256.sig'
+build_info='BUILDINFO'
 
 spath=$(dirname -- "$(command -v -- "$0")")
 sname="${0##*/}"
@@ -264,6 +265,7 @@ function extract {
 
 CONF_FILE=~/.snaprc
 SKIP_SIGN=false
+USE_BUILDINFO=true
 CPUS=$(sysctl -n hw.ncpufound)
 INTERACTIVE=$(get_conf_var 'INTERACTIVE' || echo 'false')
 DST=$(get_conf_var 'DST' || echo '/tmp/upgrade')
@@ -368,7 +370,7 @@ fi
 [[ $(id -u) -ne 0 ]] && error "need root privileges"
 
 if [ -e ~/.last_snap ]; then
-    msg "last snap run: ${white}$(cat ~/.last_snap)"
+    msg "last snap: ${white}$(cat ~/.last_snap)"
 fi
 
 kern_ver=$(sysctl kern.version | grep -oE "\-(current|beta)")
@@ -405,6 +407,8 @@ msg "${white}Fetching from: ${green}${URL}"
     if [ $SKIP_SIGN == false ]; then
 	fetch "${URL}/${base_sig}" || error "Can't fetch signature file!"
     fi
+
+    fetch "${URL}/${build_info}" || USE_BUILDINFO=false
 
     #TODO mount msdos volume and copy umg files.
 
@@ -474,7 +478,11 @@ msg "${white}Fetching from: ${green}${URL}"
 	installboot -v $INSTBOOT || error "Something bad happened - check your boot disk!"
     fi
 
-    date > ~/.last_snap
+    if [ $USE_BUILDINFO ]; then
+	awk -F- '{print $2}' "$build_info" | sed 's/^ //' > ~/.last_snap
+    else 
+	date > ~/.last_snap
+    fi
 
     if [ $REBOOT == true ]; then
 	msg "Rebooting"
