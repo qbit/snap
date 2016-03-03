@@ -4,6 +4,7 @@
 version=master
 
 red="\033[01;31m"
+yellow="\033[01;33m"
 green="\033[01;32m"
 bold="\033[01;39m"
 white="\033[0m"
@@ -80,6 +81,12 @@ function get_conf_var {
 function msg {
     if [ $INTERACTIVE == true ]; then
 	echo "${green}${1}${white}"
+    fi
+}
+
+function warn {
+    if [ $INTERACTIVE == true ]; then
+	echo "${yellow}${1}${white}"
     fi
 }
 
@@ -412,7 +419,7 @@ msg "${white}Fetching from: ${green}${URL}"
 	if [ $USE_BUILDINFO ]; then
 	    current_snap=$(awk -F- '{print $2}' "$build_info" | sed 's/^ //')
 	    if [ "${last_snap}" == "$current_snap" ]; then
-		error "No new snaps available, mirror has: ${current_snap}"
+		warn "No new snaps available, mirror has: ${current_snap}!"
 	    fi
 	fi
     fi
