@@ -1,3 +1,7 @@
+snap
+====
+OpenBSD upgrade script.
+
 - [Changes](#changes)
 - [Features](#features)
 - [Usage](#usage)
@@ -7,10 +11,6 @@
 - [Installation](#installation)
 - [Verifying an Installation](#verifying-an-installation)
 - [Releases vs master](#releases-vs-master)
-
-snap
-====
-OpenBSD upgrade script.
 
 Changes
 =======
