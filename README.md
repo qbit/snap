@@ -143,7 +143,7 @@ Old old pub key:
 - [cobug.org](https://cobug.org/snap.pub.old.old)
 - [keybase.io signed gist](https://gist.github.com/qbit/b0ed7d7cb6bac6b5afaf) signed using [my account](https://keybase.io/qbit)
 
-# Releases vs masater
+# Releases vs master
 
 You can run snap in `release` or `master` mode. `release` means the version string in the snap script is set to a number. `master`
 means it contains "master".
