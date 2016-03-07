@@ -11,12 +11,12 @@ Changes
 
 Features
 ========
-* Verify integrity of the snap script.
-* Upgrade to a release, or to snaps.
+* Verify integrity of the snap script itself.
+* Upgrade to a release, or to snaps (Not recommended. Following faq/upgradeXX.html required!).
 * Store config options in an rc file.
 * Auto # cpu detection.
-* Auto detection of arch type for arm: OMAP, IMX.
-* Signing support with [signify(1)](http://www.openbsd.org/cgi-bin/man.cgi?query=signify&apropos=0&sektion=0&manpath=OpenBSD+Current&arch=i386&format=html)
+* Auto detection of arch type for arm: OMAP, IMX (needs love!).
+* Signature verification of sets with [signify(1)](http://www.openbsd.org/cgi-bin/man.cgi?query=signify&apropos=0&sektion=0&manpath=OpenBSD+Current&arch=i386&format=html)
 
 Usage
 =====
@@ -144,7 +144,8 @@ Old old pub key:
 - [cobug.org](https://cobug.org/snap.pub.old.old)
 - [keybase.io signed gist](https://gist.github.com/qbit/b0ed7d7cb6bac6b5afaf) signed using [my account](https://keybase.io/qbit)
 
-# Releases vs master
+Releases vs master
+==================
 
 You can run snap in `release` or `master` mode. `release` means the version string in the snap script is set to a number. `master`
 means it contains "master".
