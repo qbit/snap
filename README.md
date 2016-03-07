@@ -1,3 +1,13 @@
+- [Changes](#changes)
+- [Features](#features)
+- [Usage](#usage)
+- [.snaprc options and defaults](#snaprc-options-and-defaults)
+- [Examples](#examples)
+- [Sample .snaprc](#sample-snaprc)
+- [Installation](#installation)
+- [Verifying an Installation](#verifying-an-installation)
+- [Releases vs master](#releases-vs-master)
+
 snap
 ====
 OpenBSD upgrade script.
