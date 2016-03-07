@@ -386,7 +386,9 @@ mkdir -p -- "$DST" || exit 1
 
 URL="http://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
 
-msg "${white}Fetching from: ${green}${URL}"
+if [ ! $EXTRACT_ONLY ]; then
+    msg "${white}Fetching from: ${green}${URL}"
+fi
 
 (
     cd -- "$DST" || exit 1
