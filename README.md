@@ -163,3 +163,5 @@ means it contains "master".
 The difference comes to light when doing upgrades, `-U` on a release will only upgrade to newer releases, while `master` will
 always download the latest snap from the master branch. Both are signed and can be verified with the `-I` option.
 
+`master` is to be considered experimental - similar to snapshots on OpenBSD. Experimental features will occasionally show up
+here, but breakage should be minimal (I don't push to master until I have tested).
