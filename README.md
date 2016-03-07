@@ -49,6 +49,7 @@ Usage
 * **FTP_OPTS**: *-V*
 * **MERGE**: *false*
 * **NO_X11**: *false*
+* **VER**: *uname -r*
 * **CHK_UPDATE**: *false*
 * **INS_UPDATE**: *false*
 * **INSTBOOT**: ** (no default, set to disk that has bootstrap installed, sd0 for example)
