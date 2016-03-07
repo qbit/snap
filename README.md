@@ -132,6 +132,7 @@ Pub Key:
 - [deftly.net](https://deftly.net/snap.pub)
 - [cobug.org](https://cobug.org/snap.pub)
 - [keybase.io signed gist](https://gist.github.com/qbit/21b3bfc88f50ebf5bd2a) signed using [my account](https://keybase.io/qbit)
+- [code.bolddaemon.com](http://code.bolddaemon.com/qbit/snap/src/master/snap.pub) the main repo for snap
 
 Old pub key:
 - [deftly.net](https://deftly.net/snap.pub.old)
