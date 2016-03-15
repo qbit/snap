@@ -1,3 +1,3 @@
 untrusted comment: verify with /home/qbit/signify/snap.pub
-RWQVGN6sUjQQA+nXAeF7bCVfZ2YHGwz/R1HQ8rbcjrhQ48g+YL/jiKh950mDHg0aRdd52zb53symOLMRhC6szcCNGmqBV2fvuQ0=
-SHA256 (snap) = d704876fa64250fbc9fd7c17c2b9118cb3f0c937b571907592fc96712141525a
+RWQVGN6sUjQQA7jytb5Pslj1nxbtIa8AAadSgk2yesBlpqPipiemX+tiCy5uqXLnbKbkD08H9+olFRFuXkUjFBqtHfRozPxklgc=
+SHA256 (snap) = 3bb08694dd64d32861c5ba5f4dff1a66abb42ec2a5b54ebb3a4a8f2f573e08d6

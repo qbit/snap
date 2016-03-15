@@ -289,6 +289,7 @@ CHK_UPDATE=$(get_conf_var 'CHK_UPDATE' || echo 'false')
 INS_UPDATE=$(get_conf_var 'INS_UPDATE' || echo 'false')
 INSTBOOT=$(get_conf_var 'INSTBOOT')
 REBOOT=$(get_conf_var 'REBOOT' || echo 'false')
+AFTER=$(get_conf_var 'AFTER')
 
 MIRROR=$(get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org')
 
@@ -498,6 +499,11 @@ fi
 	awk -F- '{print $2}' "$build_info" | sed 's/^ //' > ~/.last_snap
     else
 	date > ~/.last_snap
+    fi
+
+    if [ "$AFTER" != "" ]; then
+	cp $AFTER /etc/rc.firsttime
+	chmod +x /etc/rc.firsttime
     fi
 
     if [ $REBOOT == true ]; then
