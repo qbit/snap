@@ -101,6 +101,8 @@ Stored in `/etc/after_snap` with 0600 permissions.
 )    
 ```
 
+Line from `~/.snaprc` would look like this: `AFTER:/etc/after_snap`
+
 Installation
 ============
 
