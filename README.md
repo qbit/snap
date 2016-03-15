@@ -65,6 +65,7 @@ Usage
 * **INSTBOOT**: ** (no default, set to disk that has bootstrap installed, sd0 for example)
 * **REBOOT**: ** (no default, setting will cause a reboot once the upgrade is complete.)
 * **MIRROR**: *ftp3.usa.openbsd.org*
+* **AFTER**: ** (no default) script to be copied to `/etc/rc.firsttime`. This script should be kept in a safe place!
 
 Examples
 ========
@@ -86,6 +87,18 @@ Sample .snaprc
  MERGE:true
  MIRROR:ftp3.usa.openbsd.org
  NO_X11:true
+```
+
+Sample AFTER script
+===================
+
+Stored in `/etc/after_snap` with 0600 permissions.
+```
+#!/bin/sh
+(
+    cd /dev && sh MAKEDEV all
+    /usr/sbin/pkg_add -um # -m is needed to see progress in this context
+)    
 ```
 
 Installation
