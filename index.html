@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>Snap by qbit</title>
     <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script src="javascripts/main.js"></script>
     <!--[if lt IE 9]>
@@ -40,51 +40,115 @@
       </nav>
       <section>
         <h1>
-<a name="snap" class="anchor" href="#snap"><span class="octicon octicon-link"></span></a>snap</h1>
+<a id="snap" class="anchor" href="#snap" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>snap</h1>
 
-<p>OpenBSD upgrade script. </p>
-
-<h1>
-<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h1>
+<p>OpenBSD upgrade script.</p>
 
 <ul>
-<li>Upgrade to a release, or to snaps.</li>
+<li><a href="#changes">Changes</a></li>
+<li><a href="#features">Features</a></li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#snaprc-options-and-defaults">.snaprc options and defaults</a></li>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#sample-snaprc">Sample .snaprc</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#verifying-an-installation">Verifying an Installation</a></li>
+<li><a href="#releases-vs-master">Releases vs master</a></li>
+</ul>
+
+<h1>
+<a id="changes" class="anchor" href="#changes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Changes</h1>
+
+<ul>
+<li>2016-02-03 : Add ability for snap to verify its integrity via <a href="http://www.openbsd.org/cgi-bin/man.cgi?query=signify&amp;apropos=0&amp;sektion=0&amp;manpath=OpenBSD+Current&amp;arch=i386&amp;format=html">signify(1)</a>!</li>
+<li>2015-04-07 : Remove pv support as <a href="http://www.openbsd.org/cgi-bin/man.cgi/OpenBSD-current/man1/ftp.1?query=ftp&amp;arch=i386">ftp(1)</a> can do the same job.</li>
+<li>2015-03-25 : Add ability for snap to update itself and run installboot.</li>
+<li>2014-09-26 : Pull in the fixes for etc and xetc set removal.</li>
+</ul>
+
+<h1>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h1>
+
+<ul>
+<li>Verify integrity of the snap script itself.</li>
+<li>Upgrade to a release, or to snaps (Not recommended. Following faq/upgradeXX.html required!).</li>
 <li>Store config options in an rc file.</li>
-<li>Smarts about virtualized hardware.</li>
 <li>Auto # cpu detection.</li>
-<li>Auto detection of arch type for arm: OMAP, IMX.</li>
-<li>Signing support with <a href="http://www.openbsd.org/cgi-bin/man.cgi?query=signify&amp;apropos=0&amp;sektion=0&amp;manpath=OpenBSD+Current&amp;arch=i386&amp;format=html">signify(1)</a>
+<li>Auto detection of arch type for arm: OMAP, IMX (needs love!).</li>
+<li>Signature verification of sets with <a href="http://www.openbsd.org/cgi-bin/man.cgi?query=signify&amp;apropos=0&amp;sektion=0&amp;manpath=OpenBSD+Current&amp;arch=i386&amp;format=html">signify(1)</a>
 </li>
-</ul><h1>
-<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h1>
-
-<div class="highlight highlight-sh"><pre>ftp https://raw.github.com/qbit/snap/master/snap
-sudo install -m 755 snap /usr/local/bin
-</pre></div>
+</ul>
 
 <h1>
-<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h1>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h1>
 
 <ul>
-<li>-s force snap to use snapshots.</li>
-<li>-S do not check signatures.</li>
-<li>-c specify location of config file (default is ~/.snaprc)</li>
-<li>-e just extract sets in DST.</li>
-<li>-f force snap to use ftp sources (http is default).</li>
-<li>-a  use  instead of what is 'arch' returns.</li>
-<li>-m  use  instead of what 'machine -s' returns.</li>
-<li>-v  used to force snap to use  (examples: snapshots or 5.3).</li>
-<li>-V  used to force snap to use  for sets (example: -V 5.3). Note: this will only apend 53 to sets, ie base53.tgz</li>
-<li>-r run sysmerge after extracting {x}sets.</li>
-<li>-x do not extract x11 sets.</li>
-<li>-M specify a mirror to use (example: " -M ftp3.usa.openbsd.org")</li>
-<li>-i interactive with colors</li>
-<li>-n force using bsd.mp as bsd</li>
-<li>-k only install kernels and exit</li>
-<li>-B do not backup current kernel</li>
-<li>-h help</li>
-</ul><h1>
-<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h1>
+<li> -s force snap to use snapshots.</li>
+<li> -S do not check signatures.</li>
+<li> -c specify location of config file (default is ~/.snaprc)</li>
+<li> -e just extract sets in DST.</li>
+<li> -m &lt;machine&gt; use &lt;machine&gt; instead of what 'machine' returns.</li>
+<li> -v &lt;version&gt; used to force snap to use &lt;version&gt; (examples: snapshots or 5.3).</li>
+<li> -V &lt;setversion&gt; used to force snap to use &lt;setversion&gt; for sets (example: -V 5.3). Note: this will only append 53 to sets, ie base53.tgz.</li>
+<li> -r run sysmerge after extracting {x}sets. (May dump core if the snapshots have introduced ABI changes. Not recommended.)</li>
+<li> -x do not extract x11 sets.</li>
+<li> -M specify a mirror to use (example: " -M ftp3.usa.openbsd.org")</li>
+<li> -I [full path to SHA256.sig file] verify integrity of snap.</li>
+<li> -i interactive with colors.</li>
+<li> -n force using bsd.mp as bsd.</li>
+<li> -k only install kernels and exit.</li>
+<li> -B do not backup current kernel.</li>
+<li> -u check for update to snap script.</li>
+<li> -U download new snap script (will replace currently installed version).</li>
+<li> -b device to install bootstrap to.</li>
+<li> -R reboot after installation.</li>
+<li> -h help.</li>
+</ul>
+
+<h1>
+<a id="snaprc-options-and-defaults" class="anchor" href="#snaprc-options-and-defaults" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>.snaprc options and defaults</h1>
+
+<ul>
+<li>
+<strong>INTERACTIVE</strong>: <em>false</em>
+</li>
+<li>
+<strong>DST</strong>: <em>/tmp/upgrade</em>
+</li>
+<li>
+<strong>EXTRACT_ONLY</strong>: <em>false</em>
+</li>
+<li>
+<strong>FTP_OPTS</strong>: <em>-V</em>
+</li>
+<li>
+<strong>MERGE</strong>: <em>false</em>
+</li>
+<li>
+<strong>NO_X11</strong>: <em>false</em>
+</li>
+<li>
+<strong>VER</strong>: <em>uname -r</em>
+</li>
+<li>
+<strong>CHK_UPDATE</strong>: <em>false</em>
+</li>
+<li>
+<strong>INS_UPDATE</strong>: <em>false</em>
+</li>
+<li>
+<strong>INSTBOOT</strong>: ** (no default, set to disk that has bootstrap installed, sd0 for example)</li>
+<li>
+<strong>REBOOT</strong>: ** (no default, setting will cause a reboot once the upgrade is complete.)</li>
+<li>
+<strong>MIRROR</strong>: <em>ftp3.usa.openbsd.org</em>
+</li>
+<li>
+<strong>AFTER</strong>: ** (no default) script to be copied to <code>/etc/rc.firsttime</code>. This script should be kept in a safe place!</li>
+</ul>
+
+<h1>
+<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Examples</h1>
 
 <p>To update to the latest snapshot using an explicit mirror
   region:</p>
@@ -98,15 +162,117 @@ sudo install -m 755 snap /usr/local/bin
 </code></pre>
 
 <h1>
-<a name="sample-snaprc" class="anchor" href="#sample-snaprc"><span class="octicon octicon-link"></span></a>Sample .snaprc</h1>
+<a id="sample-snaprc" class="anchor" href="#sample-snaprc" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Sample .snaprc</h1>
 
 <pre><code> INTERACTIVE:true
  DST:/tmp/upgrade
  MERGE:true
  MIRROR:ftp3.usa.openbsd.org
  NO_X11:true
- PROTO:ftp
 </code></pre>
+
+<h1>
+<a id="sample-after-script" class="anchor" href="#sample-after-script" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Sample AFTER script</h1>
+
+<p>Stored in <code>/etc/after_snap</code> with 0600 permissions.</p>
+
+<pre><code>#!/bin/sh
+(
+    cd /dev &amp;&amp; sh MAKEDEV all
+    /usr/sbin/pkg_add -um # -m is needed to see progress in this context
+)    
+</code></pre>
+
+<p>Line from <code>~/.snaprc</code> would look like this: <code>AFTER:/etc/after_snap</code></p>
+
+<h1>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h1>
+
+<pre><code># make install
+</code></pre>
+
+<h1>
+<a id="verifying-an-installation" class="anchor" href="#verifying-an-installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Verifying an Installation</h1>
+
+<p><strong>WARNING: I have had to create new keys for signing snap. Please update your pub key!</strong></p>
+
+<p><code>snap</code> now can be verified via <a href="http://www.openbsd.org/cgi-bin/man.cgi?query=signify&amp;apropos=0&amp;sektion=0&amp;manpath=OpenBSD+Current&amp;arch=i386&amp;format=html">signify(1)</a>!</p>
+
+<p>The public key is as follows:</p>
+
+<pre><code>untrusted comment: github.com/qbit/snap public key
+RWQVGN6sUjQQA5uYpANGLLKQMAERZ43otLePFSVqNFGGtf/qBez7G1WU
+</code></pre>
+
+<p>The old public key is:</p>
+
+<pre><code>untrusted comment: github.com/qbit/snap public key
+RWTKOAnI3kqGqY/1ungBemfzkDj4ImXuybf4sDZcCrNJywffIRDkK1qF
+</code></pre>
+
+<p>The old old public key is:</p>
+
+<pre><code>untrusted comment: github.com/qbit/snap public key
+RWQkqrbMjoywaLwJQf45TjtCLgtFPSEO7v/TBf01WRZjvl8NSy6rJ6Fe
+</code></pre>
+
+<p>Verification of the signature can be done with the following command (once the above key is added to <code>/etc/signify/snap.pub</code>):</p>
+
+<pre><code>snap -I
+</code></pre>
+
+<p>or</p>
+
+<pre><code>signify -C -p /etc/signify/snap.pub -x SHA256.sig snap
+</code></pre>
+
+<p>But Aaron, how do I know I have the correct public key? Mirrors.</p>
+
+<p>The key is also available on the following locations:</p>
+
+<p>Pub Key:</p>
+
+<ul>
+<li><a href="https://deftly.net/snap.pub">deftly.net</a></li>
+<li><a href="https://cobug.org/snap.pub">cobug.org</a></li>
+<li>
+<a href="https://gist.github.com/qbit/21b3bfc88f50ebf5bd2a">keybase.io signed gist</a> signed using <a href="https://keybase.io/qbit">my account</a>
+</li>
+<li>
+<a href="http://code.bolddaemon.com/qbit/snap/src/master/snap.pub">code.bolddaemon.com</a> the main repo for snap</li>
+</ul>
+
+<p>Old pub key:</p>
+
+<ul>
+<li><a href="https://deftly.net/snap.pub.old">deftly.net</a></li>
+<li><a href="https://cobug.org/snap.pub.old">cobug.org</a></li>
+<li>
+<a href="https://gist.github.com/qbit/1c4884883c38c79ce24d">keybase.io signed gist</a> signed using <a href="https://keybase.io/qbit">my account</a>
+</li>
+</ul>
+
+<p>Old old pub key:</p>
+
+<ul>
+<li><a href="https://deftly.net/snap.pub.old.old">deftly.net</a></li>
+<li><a href="https://cobug.org/snap.pub.old.old">cobug.org</a></li>
+<li>
+<a href="https://gist.github.com/qbit/b0ed7d7cb6bac6b5afaf">keybase.io signed gist</a> signed using <a href="https://keybase.io/qbit">my account</a>
+</li>
+</ul>
+
+<h1>
+<a id="releases-vs-master" class="anchor" href="#releases-vs-master" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Releases vs master</h1>
+
+<p>You can run snap in <code>release</code> or <code>master</code> mode. <code>release</code> means the version string in the snap script is set to a number. <code>master</code>
+means it contains "master".</p>
+
+<p>The difference comes to light when doing upgrades, <code>-U</code> on a release will only upgrade to newer releases, while <code>master</code> will
+always download the latest snap from the master branch. Both are signed and can be verified with the <code>-I</code> option.</p>
+
+<p><code>master</code> is to be considered experimental - similar to snapshots on OpenBSD. Experimental features will occasionally show up
+here, but breakage should be minimal (I don't push to master until I have tested).</p>
       </section>
       <footer>
         <p>Project maintained by <a href="https://github.com/qbit">qbit</a></p>
