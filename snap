@@ -239,6 +239,14 @@ function update_kernel {
 	cp bsd /bsd.sp || FAIL=1
     fi
 
+    if [ "${MACHINE}" == "armv7" ]; then
+	ROOT_DEV=$(grep "/ ffs" /etc/fstab | cut -d. -f1)
+	msg "Mounting ${ROOT_DEV}.i on /mnt"
+	mount ${ROOT_DEV}.i /mnt || error "Can't mount MSDOS partition!"
+	cp bsd.${TYPE}.umg /mnt/bsd.umg || FAIL=1
+	cp bsd.rd.${TYPE}.umg /mnt/bsdrd.umg || FAIL=1
+    fi
+
     if [ $FAIL == 1 ]; then
 	error "Failed to copy new kernel"
     else
@@ -268,6 +276,35 @@ function fetch {
 function extract {
     ftp -D Extracting -Vmo - "file://${1}" | tar -C / -xzphf - \
 	|| error "Failed to extract ${1}"
+}
+
+function get_type {
+    DMESG=$(dmesg)
+    RET=""
+
+    # Logic taken from distrib/armv7/ramdisk/install.md
+
+    if echo "$DMESG" | grep -q '^omap0 at mainbus0:'; then
+        RET="OMAP"
+    fi
+
+    if echo "$DMESG" | grep -q '^imx0 at mainbus0:'; then
+        RET="IMX"
+    fi
+
+    if echo "$DMESG" | grep -q '^sunxi0 at mainbus0:'; then
+        RET="SUNXI"
+    fi
+
+    if echo "$DMESG" | grep -q '^vexpress0 at mainbus0:'; then
+        if echo $DMESG | grep -q '^cpu0 at mainbus0: ARM Cortex A9 '; then
+            RET="VEXPRESSA9"
+        else
+            RET="VEXPRESSA15"
+        fi
+    fi
+
+    echo $RET
 }
 
 CONF_FILE=~/.snaprc
@@ -379,7 +416,7 @@ fi
 
 kern_ver=$(sysctl kern.version | grep -oE "\-(current|beta)")
 if [ $? == 0 ]; then
-    msg "kern.version: ${white}reporting as $kern_ver"
+    msg "kern.version: ${white}reporting as $kern_ver on ${MACHINE}"
     VER='snapshots'
 fi
 
@@ -396,14 +433,11 @@ fi
 
     # first element should be bsd, second should be mp for given kernel names.
     if [ "${MACHINE}" == "armv7" ]; then
-	TYPE=$(uname -v | awk -F - '{print $NF}' | cut -d# -f1)
+	TYPE="$(get_type)"
+	msg "SoC type: ${white}${TYPE}"
 	# Currently there is no bsd.mp
 	#set -A bsds "bsd.${TYPE}" "bsd.mp.${TYPE}" "bsd.rd.${TYPE}" "bsd.${TYPE}.umg"
-	if [ -e /bsd.${TYPE} ]; then
-	    set -A bsds "bsd.${TYPE}" "" "bsd.rd.${TYPE}" "bsd.${TYPE}.umg"
-	else
-	    set -A bsds 'bsd' '' 'bsd.rd' 'bsd.umg'
-	fi
+	set -A bsds "bsd" "" "bsd.rd" "bsd.${TYPE}.umg" "bsd.rd.${TYPE}.umg"
     else
 	set -A bsds 'bsd' 'bsd.mp' 'bsd.rd'
     fi
