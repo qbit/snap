@@ -530,6 +530,8 @@ fi
 	msg "Running sysmerge"
 	sysmerge ${MERG_OPT} || error "Failed to sysmerge!"
     else
+        echo "/usr/sbin/sysmerge -b" >>/etc/rc.sysmerge
+        chmod +x /etc/rc.sysmerge
 	echo "Don't forget to run sysmerge!"
     fi
 
@@ -547,6 +549,10 @@ fi
     if [ "$AFTER" != "" ]; then
 	cp $AFTER /etc/rc.firsttime
 	chmod +x /etc/rc.firsttime
+    else
+        echo 'cd /dev && sh MAKEDEV all' >>/etc/rc.firsttime
+        echo "/usr/sbin/fw_update -v" >>/etc/rc.firsttime
+        chmod +x /etc/rc.firsttime
     fi
 
     if [ $REBOOT == true ]; then

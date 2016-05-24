@@ -97,6 +97,7 @@ Stored in `/etc/after_snap` with 0600 permissions.
 #!/bin/sh
 (
     cd /dev && sh MAKEDEV all
+    /usr/sbin/fw_update -v
     /usr/sbin/pkg_add -um # -m is needed to see progress in this context
 )    
 ```
