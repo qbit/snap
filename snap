@@ -422,7 +422,14 @@ fi
 
 mkdir -p -- "$DST" || exit 1
 
-URL="http://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
+case "${MIRROR}" in
+    http://* | ftp://* | https://*)
+        URL="${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
+        ;;
+    *)
+        URL="http://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
+        ;;
+esac
 
 if [ ! $EXTRACT_ONLY ]; then
     msg "${white}Fetching from: ${green}${URL}"
