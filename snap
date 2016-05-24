@@ -326,9 +326,9 @@ VER=$(get_conf_var 'VER' || echo $(uname -r))
 CHK_INTEG=false
 CHK_UPDATE=$(get_conf_var 'CHK_UPDATE' || echo 'false')
 INS_UPDATE=$(get_conf_var 'INS_UPDATE' || echo 'false')
-INSTBOOT=$(get_conf_var 'INSTBOOT')
+INSTBOOT=$(get_conf_var 'INSTBOOT' || echo 'false')
 REBOOT=$(get_conf_var 'REBOOT' || echo 'false')
-AFTER=$(get_conf_var 'AFTER')
+AFTER=$(get_conf_var 'AFTER' || echo 'false')
 
 MIRROR=$(get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org')
 
@@ -486,7 +486,7 @@ fi
 	    KERNEL=${bsds[1]}
 	fi
 
-	if [ -z $NO_KBACKUPS ]; then
+	if [ "${NO_KBACKUPS:=false}" == true ]; then
 	    backup
 	fi
 
@@ -528,14 +528,14 @@ fi
 
     if [ $MERGE == true ]; then
 	msg "Running sysmerge"
-	sysmerge ${MERG_OPT} || error "Failed to sysmerge!"
+	sysmerge || error "Failed to sysmerge!"
     else
         echo "/usr/sbin/sysmerge -b" >>/etc/rc.sysmerge
         chmod +x /etc/rc.sysmerge
 	echo "Don't forget to run sysmerge!"
     fi
 
-    if [ $INSTBOOT ]; then
+    if [ $INSTBOOT != false ]; then
 	msg "Installing bootstrap on ${INSTBOOT}"
 	installboot -v $INSTBOOT || error "Something bad happened - check your boot disk!"
     fi
@@ -546,7 +546,7 @@ fi
 	date > ~/.last_snap
     fi
 
-    if [ "$AFTER" != "" ]; then
+    if [ "$AFTER" != false ]; then
 	cp $AFTER /etc/rc.firsttime
 	chmod +x /etc/rc.firsttime
     else
