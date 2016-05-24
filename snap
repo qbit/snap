@@ -1,5 +1,7 @@
 #!/bin/ksh
 
+set -eu
+
 # 1.0.14
 version=master
 
