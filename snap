@@ -11,6 +11,10 @@ green="\033[01;32m"
 bold="\033[01;39m"
 white="\033[0m"
 
+sets=""
+xsets=""
+bsds=""
+
 set -A sets 'comp' 'game' 'man' 'base'
 set -A xsets 'xbase' 'xfont' 'xserv' 'xshare'
 base_sig='SHA256.sig'
@@ -322,7 +326,7 @@ MACHINE=$(machine)
 MERGE=$(get_conf_var 'MERGE' || echo 'false')
 NO_X11=$(get_conf_var 'NO_X11' || echo 'false')
 SETVER=$(uname -r | tr -d \.)
-VER=$(get_conf_var 'VER' || echo $(uname -r))
+VER=$(get_conf_var 'VER' || echo "$(uname -r)")
 CHK_INTEG=false
 CHK_UPDATE=$(get_conf_var 'CHK_UPDATE' || echo 'false')
 INS_UPDATE=$(get_conf_var 'INS_UPDATE' || echo 'false')
@@ -355,7 +359,7 @@ while getopts "b:Bc:ehiIkm:M:nrRsSuUv:V:x" arg; do
 	I)
 	    CHK_INTEG=true
 	    shift $((${OPTIND}-1))
-	    INTEG_SIG_FILE=$@
+	    INTEG_SIG_FILE=$*
 	    INTEG_SIG_FILE=${INTEG_SIG_FILE:-SHA256.sig}
 	    OPTIND=1
 	    ;;
