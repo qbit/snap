@@ -154,7 +154,7 @@ function backup {
     fi
 
     if [ $FAIL == 1 ]; then
-	error "Failed to backup"
+	error "Failed to backup" false
     else
 	msg "Backed up the following:
     ${bold}/bsd => /obsd
@@ -175,7 +175,7 @@ function rollback {
     cp /sbin/oreboot /sbin/reboot || FAIL=1
 
     if [ $FAIL == 1 ]; then
-	error "Failed to rollback"
+	error "Failed to rollback" false
     else
 	msg "Restored the old files for the following:
     ${bold}/bsd => /obsd
@@ -193,7 +193,7 @@ function check_integ {
     #file=${file:S/\.\///}
 
     if [ ! -f "${key}" ]; then
-	error "No public key (${key}).\nSee https://github.com/qbit/snap for more info!"
+	error "No public key (${key}).\nSee https://github.com/qbit/snap for more info!" false
     fi
 
     if [ ! -f "${INTEG_SIG_FILE}" ]; then
@@ -225,7 +225,7 @@ function verisigs {
 	    error "Invalid signature found! They are after you!" true
 	fi
     else
-	error "No pub key found for this release! (${KEY})"
+	error "No pub key found for this release! (${KEY})" false
     fi
 }
 
@@ -244,13 +244,13 @@ function update_kernel {
     if [ "${MACHINE}" == "armv7" ]; then
 	ROOT_DEV=$(grep "/ ffs" /etc/fstab | cut -d. -f1)
 	msg "Mounting ${ROOT_DEV}.i on /mnt"
-	mount ${ROOT_DEV}.i /mnt || error "Can't mount MSDOS partition!"
+	mount ${ROOT_DEV}.i /mnt || error "Can't mount MSDOS partition!" false
 	cp bsd.${TYPE}.umg /mnt/bsd.umg || FAIL=1
 	cp bsd.rd.${TYPE}.umg /mnt/bsdrd.umg || FAIL=1
     fi
 
     if [ $FAIL == 1 ]; then
-	error "Failed to copy new kernel"
+	error "Failed to copy new kernel" false
     else
 	msg "Set primary kernel to ${KERNEL}:
     ${KERNEL} => /bsd"
@@ -277,7 +277,7 @@ function fetch {
 
 function extract {
     ftp -D Extracting -Vmo - "file://${1}" | tar -C / -xzphf - \
-	|| error "Failed to extract ${1}"
+	|| error "Failed to extract ${1}" false
 }
 
 function get_type {
@@ -414,7 +414,7 @@ if [ $CHK_UPDATE == true ]; then
     exit 0
 fi
 
-[[ $(id -u) -ne 0 ]] && error "need root privileges"
+[[ $(id -u) -ne 0 ]] && error "need root privileges" false
 
 kern_ver=$(sysctl kern.version | grep -oE "\-(current|beta)")
 if [ $? == 0 ]; then
@@ -454,7 +454,7 @@ fi
     RD=${bsds[2]}
 
     if [ $SKIP_SIGN == false ]; then
-	fetch "${URL}/${base_sig}" || error "Can't fetch signature file!"
+	fetch "${URL}/${base_sig}" || error "Can't fetch signature file!" false
     fi
 
     fetch "${URL}/${build_info}" || USE_BUILDINFO=false
@@ -475,7 +475,7 @@ fi
     if [ $EXTRACT_ONLY == false ]; then
 	msg "Fetching bsds"
 	for bsd in "${bsds[@]}"; do
-	    fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}"
+	    fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}" false
 	done
 
 	if [ "${CPUS}" == "1" ] && [ -z $FORCE_MP ]; then
@@ -528,7 +528,7 @@ fi
 
     if [ $MERGE == true ]; then
 	msg "Running sysmerge"
-	sysmerge || error "Failed to sysmerge!"
+	sysmerge || error "Failed to sysmerge!" false
     else
         echo "/usr/sbin/sysmerge -b" >>/etc/rc.sysmerge
         chmod +x /etc/rc.sysmerge
@@ -537,7 +537,7 @@ fi
 
     if [ $INSTBOOT != false ]; then
 	msg "Installing bootstrap on ${INSTBOOT}"
-	installboot -v $INSTBOOT || error "Something bad happened - check your boot disk!"
+	installboot -v $INSTBOOT || error "Something bad happened - check your boot disk!" false
     fi
 
     if [ $USE_BUILDINFO ]; then
@@ -557,6 +557,6 @@ fi
 
     if [ $REBOOT == true ]; then
 	msg "Rebooting"
-	/sbin/oreboot || error "Something really bad happened - Can't reboot!"
+	/sbin/oreboot || error "Something really bad happened - Can't reboot!" false
     fi
 )
