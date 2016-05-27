@@ -482,7 +482,7 @@ fi
 	    fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}" false
 	done
 
-	if [ "${CPUS}" == "1" ] && [ -z $FORCE_MP ]; then
+	if [ "${CPUS}" == "1" ] && [ "${FORCE_MP:=false}" != true ]; then
 	    msg "${white}Using ${green}bsd.."
 	    KERNEL=${bsds[0]}
 	else
