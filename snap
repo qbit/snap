@@ -2,8 +2,8 @@
 
 set -eu
 
-# 1.0.14
-version=master
+# 1.0.15
+version=1.0.15
 
 red="\033[01;31m"
 yellow="\033[01;33m"
