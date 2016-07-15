@@ -284,35 +284,6 @@ function extract {
 	|| error "Failed to extract ${1}" false
 }
 
-function get_type {
-    DMESG=$(dmesg)
-    RET=""
-
-    # Logic taken from distrib/armv7/ramdisk/install.md
-
-    if echo "$DMESG" | grep -q '^omap0 at mainbus0:'; then
-        RET="OMAP"
-    fi
-
-    if echo "$DMESG" | grep -q '^imx0 at mainbus0:'; then
-        RET="IMX"
-    fi
-
-    if echo "$DMESG" | grep -q '^sunxi0 at mainbus0:'; then
-        RET="SUNXI"
-    fi
-
-    if echo "$DMESG" | grep -q '^vexpress0 at mainbus0:'; then
-        if echo $DMESG | grep -q '^cpu0 at mainbus0: ARM Cortex A9 '; then
-            RET="VEXPRESSA9"
-        else
-            RET="VEXPRESSA15"
-        fi
-    fi
-
-    echo $RET
-}
-
 CONF_FILE=~/.snaprc
 SKIP_SIGN=false
 USE_BUILDINFO=true
@@ -446,11 +417,8 @@ fi
 
     # first element should be bsd, second should be mp for given kernel names.
     if [ "${MACHINE}" == "armv7" ]; then
-	TYPE="$(get_type)"
-	msg "SoC type: ${white}${TYPE}"
 	# Currently there is no bsd.mp
-	#set -A bsds "bsd.${TYPE}" "bsd.mp.${TYPE}" "bsd.rd.${TYPE}" "bsd.${TYPE}.umg"
-	set -A bsds "bsd" "" "bsd.rd" "bsd.${TYPE}.umg" "bsd.rd.${TYPE}.umg"
+	set -A bsds "bsd" "" "bsd.rd"
     else
 	set -A bsds 'bsd' 'bsd.mp' 'bsd.rd'
     fi
@@ -473,8 +441,6 @@ fi
 	    fi
 	fi
     fi
-
-    #TODO mount msdos volume and copy umg files.
 
     if [ $EXTRACT_ONLY == false ]; then
 	msg "Fetching bsds"
