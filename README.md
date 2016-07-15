@@ -14,6 +14,7 @@ OpenBSD upgrade script.
 
 Changes
 =======
+* 2016-07-15 : Fix armv7. Now working without umg files.
 * 2016-02-03 : Add ability for snap to verify its integrity via [signify(1)](http://www.openbsd.org/cgi-bin/man.cgi?query=signify&apropos=0&sektion=0&manpath=OpenBSD+Current&arch=i386&format=html)!
 * 2015-04-07 : Remove pv support as [ftp(1)](http://www.openbsd.org/cgi-bin/man.cgi/OpenBSD-current/man1/ftp.1?query=ftp&arch=i386) can do the same job.
 * 2015-03-25 : Add ability for snap to update itself and run installboot.
