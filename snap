@@ -249,8 +249,8 @@ function update_kernel {
 	ROOT_DEV=$(grep "/ ffs" /etc/fstab | cut -d. -f1)
 	msg "Mounting ${ROOT_DEV}.i on /mnt"
 	mount ${ROOT_DEV}.i /mnt || error "Can't mount MSDOS partition!" false
-	cp bsd.${TYPE}.umg /mnt/bsd.umg || FAIL=1
-	cp bsd.rd.${TYPE}.umg /mnt/bsdrd.umg || FAIL=1
+	cp ${KERNEL} /mnt/bsd || FAIL=1
+	cp ${RD} /mnt/bsd.rd || FAIL=1
     fi
 
     if [ $FAIL == 1 ]; then
@@ -430,11 +430,11 @@ mkdir -p -- "$DST" || exit 1
 
 case "${MIRROR}" in
     http://* | ftp://* | https://*)
-        URL="${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
-        ;;
+	URL="${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
+	;;
     *)
-        URL="http://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
-        ;;
+	URL="http://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
+	;;
 esac
 
 if [ ! $EXTRACT_ONLY ]; then
@@ -522,7 +522,7 @@ fi
 	extract "${DST}/${set}${SETVER}.tgz"
 
 	if [ "${set}" == "man" ] && [ "${NO_X11}" == "false" ]; then
-	    msg "Extracting xsets ${white} will continue with sets after. ${green}"
+	    msg "Extracting xsets ${white}will continue with sets after. ${green}"
 
 	    for xset in "${xsets[@]}"; do
 		extract "${DST}/${xset}${SETVER}.tgz"
@@ -534,8 +534,8 @@ fi
 	msg "Running sysmerge"
 	sysmerge || error "Failed to sysmerge!" false
     else
-        echo "/usr/sbin/sysmerge -b" >>/etc/rc.sysmerge
-        chmod +x /etc/rc.sysmerge
+	echo "/usr/sbin/sysmerge -b" >>/etc/rc.sysmerge
+	chmod +x /etc/rc.sysmerge
 	echo "Don't forget to run sysmerge!"
     fi
 
@@ -554,9 +554,9 @@ fi
 	cp $AFTER /etc/rc.firsttime
 	chmod +x /etc/rc.firsttime
     else
-        echo 'cd /dev && sh MAKEDEV all' >>/etc/rc.firsttime
-        echo "/usr/sbin/fw_update -v" >>/etc/rc.firsttime
-        chmod +x /etc/rc.firsttime
+	echo 'cd /dev && sh MAKEDEV all' >>/etc/rc.firsttime
+	echo "/usr/sbin/fw_update -v" >>/etc/rc.firsttime
+	chmod +x /etc/rc.firsttime
     fi
 
     if [ $REBOOT == true ]; then
