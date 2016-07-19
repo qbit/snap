@@ -45,6 +45,7 @@ Usage
 *  -i interactive with colors.
 *  -n force using bsd.mp as bsd.
 *  -k only install kernels and exit.
+*  -K install only the sets without the kernel.
 *  -B do not backup current kernel.
 *  -u check for update to snap script.
 *  -U download new snap script (will replace currently installed version).
