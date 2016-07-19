@@ -401,10 +401,12 @@ fi
 
 [[ $(id -u) -ne 0 ]] && error "need root privileges" false
 
-kern_ver=$(sysctl kern.version | grep -oE "\-(current|beta)")
-if [ $? == 0 ]; then
-    msg "kern.version: ${white}reporting as $kern_ver on ${MACHINE}"
-    VER='snapshots'
+if [ $VER != "snapshots" ]; then
+    kern_ver=$(sysctl kern.version | grep -oE "\-(current|beta)")
+    if [ $? == 0 ]; then
+        msg "kern.version: ${white}reporting as $kern_ver on ${MACHINE}"
+        VER='snapshots'
+    fi
 fi
 
 mkdir -p -- "$DST" || exit 1
