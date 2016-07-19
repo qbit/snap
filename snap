@@ -42,6 +42,7 @@ snap options:
   -i interactive with colors.
   -n force using bsd.mp as bsd.
   -k only install kernels and exit.
+  -K install only the sets without the kernel.
   -B do not backup current kernel.
   -u check for update to snap script.
   -U download new snap script (will replace currently installed version).
@@ -292,6 +293,7 @@ INTERACTIVE=$(get_conf_var 'INTERACTIVE' || echo 'false')
 DST=$(get_conf_var 'DST' || echo '/tmp/upgrade')
 EXTRACT_ONLY=$(get_conf_var 'EXTRACT_ONLY' || echo 'false')
 KERNEL_ONLY=false
+SETS_ONLY=false
 FTP_OPTS=$(get_conf_var 'FTP_OPTS' || echo " -V ")
 MACHINE=$(machine)
 MERGE=$(get_conf_var 'MERGE' || echo 'false')
@@ -307,7 +309,7 @@ AFTER=$(get_conf_var 'AFTER' || echo 'false')
 
 MIRROR=$(get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org')
 
-while getopts "b:Bc:ehiIkm:M:nrRsSuUv:V:x" arg; do
+while getopts "b:Bc:ehiIkKm:M:nrRsSuUv:V:x" arg; do
     case $arg in
 	b)
 	    INSTBOOT=$OPTARG
@@ -336,6 +338,9 @@ while getopts "b:Bc:ehiIkm:M:nrRsSuUv:V:x" arg; do
 	    ;;
 	k)
 	    KERNEL_ONLY=true
+	    ;;
+	K)
+	    SETS_ONLY=true
 	    ;;
 	m)
 	    MACHINE=$OPTARG
@@ -378,6 +383,11 @@ while getopts "b:Bc:ehiIkm:M:nrRsSuUv:V:x" arg; do
 	    exit 1
     esac
 done
+
+if [ $KERNEL_ONLY == true ] && [ $SETS_ONLY == true ]; then
+    echo 'The options -k and -K are mutually exclusive.'
+    exit 1
+fi
 
 if [ $CHK_INTEG == true ]; then
     check_integ
@@ -443,28 +453,30 @@ fi
     fi
 
     if [ $EXTRACT_ONLY == false ]; then
-	msg "Fetching bsds"
-	for bsd in "${bsds[@]}"; do
-	    fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}" false
-	done
+        if [ $SETS_ONLY == false ]; then
+            msg "Fetching bsds"
+            for bsd in "${bsds[@]}"; do
+                fetch "${URL}/${bsd}" || error "Can't find bsds at ${URL}" false
+            done
 
-	if [ "${CPUS}" == "1" ] && [ "${FORCE_MP:=false}" != true ]; then
-	    msg "${white}Using ${green}bsd.."
-	    KERNEL=${bsds[0]}
-	else
-	    msg "${white}Using ${green}bsd.mp.."
-	    KERNEL=${bsds[1]}
-	fi
+            if [ "${CPUS}" == "1" ] && [ "${FORCE_MP:=false}" != true ]; then
+                msg "${white}Using ${green}bsd.."
+                KERNEL=${bsds[0]}
+            else
+                msg "${white}Using ${green}bsd.mp.."
+                KERNEL=${bsds[1]}
+            fi
 
-	if [ "${NO_KBACKUPS:=false}" == true ]; then
-	    backup
-	fi
+            if [ "${NO_KBACKUPS:=false}" == true ]; then
+                backup
+            fi
 
-	update_kernel
+            update_kernel
 
-	if [ $KERNEL_ONLY == true ]; then
-	    exit 0
-	fi
+            if [ $KERNEL_ONLY == true ]; then
+                exit 0
+            fi
+        fi # SETS_ONLY
 
 	msg "Fetching sets"
 	for set in "${sets[@]}"; do
