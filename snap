@@ -257,14 +257,6 @@ function update_kernel {
 	cp bsd /bsd.sp || FAIL=1
     fi
 
-    if [ "${MACHINE}" == "armv7" ]; then
-	ROOT_DEV=$(grep "/ ffs" /etc/fstab | cut -d. -f1)
-	msg "Mounting ${ROOT_DEV}.i on /mnt"
-	mount ${ROOT_DEV}.i /mnt || error "Can't mount MSDOS partition!" false
-	cp ${KERNEL} /mnt/bsd || FAIL=1
-	cp ${RD} /mnt/bsd.rd || FAIL=1
-    fi
-
     if [ $FAIL == 1 ]; then
 	error "Failed to copy new kernel" false
     else
