@@ -32,8 +32,8 @@ snap options:
   -S do not check signatures.
   -c specify location of config file (default is ~/.snaprc)
   -e just extract sets in DST.
+  -d just download sets to DST, verify and exit.
   -m <machine> use <machine> instead of what 'machine' returns.
-  -v <version> used to force snap to use <version> (examples: snapshots or 5.3).
   -V <setversion> used to force snap to use <setversion> for sets (example: -V 5.3). Note: this will only append 53 to sets, ie base53.tgz.
   -r run sysmerge after extracting {x}sets. (May dump core if the snapshots have introduced ABI changes. Not recommended.)
   -x do not extract x11 sets.
@@ -50,23 +50,34 @@ snap options:
   -R reboot after installation.
   -h help.
 
-  Examples:
-    To update to the latest snapshot using the fastest mirror for your
-    region:
+ Examples:
 
-      snap -s -M ftp3.usa.openbsd.org
+   To upgrade to the latest snapshots:
 
-    To update to the latest version of 5.3 without updating xsets:
+     $ doas snap
 
-      snap -v 5.3 -V 5.3 -x -M ftp3.usa.openbsd.org
+   To update to the latest snapshot using an explicit mirror
+   region:
 
-  Example ~/.snaprc
-    INTERACTIVE:true
-    DST:/tmp/upgrade
-    MERGE:true
-    MIRROR:ftp3.usa.openbsd.org
-    NO_X11:true
-    FTP_OPTS:-C -V
+     $ doas snap -M ftp3.usa.openbsd.org
+
+   To update to the snapshot without updating xsets:
+
+     $ doas snap -x
+
+   When a new beta is cut, the system version jumps from X.Y to X.Z.
+   When this happens, snap will need to be told what the new version
+   is:
+
+     $ doas snap -V 6.1
+
+ Example ~/.snaprc
+
+   INTERACTIVE:true
+   DST:/tmp/upgrade
+   MERGE:true
+   MIRROR:ftp3.usa.openbsd.org
+   NO_X11:true
 
 EOF
     exit 0
@@ -306,10 +317,11 @@ INS_UPDATE=$(get_conf_var 'INS_UPDATE' || echo 'false')
 INSTBOOT=$(get_conf_var 'INSTBOOT' || echo 'false')
 REBOOT=$(get_conf_var 'REBOOT' || echo 'false')
 AFTER=$(get_conf_var 'AFTER' || echo 'false')
+DOWNLOAD_ONLY=false
 
 MIRROR=$(get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org')
 
-while getopts "b:Bc:ehiIkKm:M:nrRsSuUv:V:x" arg; do
+while getopts "b:Bc:dD:ehiIkKm:M:nrRsSuUV:x" arg; do
     case $arg in
 	b)
 	    INSTBOOT=$OPTARG
@@ -319,6 +331,12 @@ while getopts "b:Bc:ehiIkKm:M:nrRsSuUv:V:x" arg; do
 	    ;;
 	c)
 	    CONF_FILE=$OPTARG
+	    ;;
+	D)
+	    DST=$OPTARG
+	    ;;
+	d)
+	    DOWNLOAD_ONLY=true
 	    ;;
 	e)
 	    EXTRACT_ONLY=true
@@ -369,9 +387,6 @@ while getopts "b:Bc:ehiIkKm:M:nrRsSuUv:V:x" arg; do
 	U)
 	    CHK_UPDATE=true
 	    INS_UPDATE=true
-	    ;;
-	v)
-	    VER=$OPTARG
 	    ;;
 	V)
 	    SETVER=$(echo $OPTARG | tr -d \.)
@@ -470,10 +485,14 @@ fi
             fi
 
             if [ "${NO_KBACKUPS:=false}" == true ]; then
-                backup
+                if [ $DOWNLOAD_ONLY == false ]; then
+                    backup
+                fi
             fi
 
-            update_kernel
+            if [ $DOWNLOAD_ONLY == false ]; then
+                update_kernel
+            fi
 
             if [ $KERNEL_ONLY == true ]; then
                 exit 0
@@ -495,6 +514,10 @@ fi
 
     if [ $SKIP_SIGN == false ]; then
 	verisigs "*.tgz"
+    fi
+
+    if [ $DOWNLOAD_ONLY == true ]; then
+	exit 0
     fi
 
     msg "Extracting sets"
