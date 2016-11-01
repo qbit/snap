@@ -2,8 +2,8 @@ snap
 ====
 OpenBSD upgrade script.
 
-- [Changes](#changes)
 - [Features](#features)
+- [Changes](#changes)
 - [Usage](#usage)
 - [.snaprc options and defaults](#snaprc-options-and-defaults)
 - [Examples](#examples)
@@ -11,6 +11,12 @@ OpenBSD upgrade script.
 - [Installation](#installation)
 - [Verifying an Installation](#verifying-an-installation)
 - [Releases vs master](#releases-vs-master)
+
+Features
+========
+* Upgrade an OpenBSD-current machine to the latest snapshots. (Following [faq/current.html](https://www.openbsd.org/faq/current.html) still needs to be done!)
+* Verify integrity of sets and the snap script itself using [signify(1)](http://www.openbsd.org/cgi-bin/man.cgi?query=signify&apropos=0&sektion=0&manpath=OpenBSD+Current&arch=i386&format=html).
+* Configure via CLI flags or config options in an rc file.
 
 Changes
 =======
@@ -20,24 +26,15 @@ Changes
 * 2015-03-25 : Add ability for snap to update itself and run installboot.
 * 2014-09-26 : Pull in the fixes for etc and xetc set removal.
 
-Features
-========
-* Verify integrity of the snap script itself.
-* Upgrade to a release, or to snaps (Not recommended. Following faq/upgradeXX.html required!).
-* Store config options in an rc file.
-* Auto # cpu detection.
-* Auto detection of arch type for arm: OMAP, IMX (needs love!).
-* Signature verification of sets with [signify(1)](http://www.openbsd.org/cgi-bin/man.cgi?query=signify&apropos=0&sektion=0&manpath=OpenBSD+Current&arch=i386&format=html)
-
 Usage
 =====
 *  -s force snap to use snapshots.
 *  -S do not check signatures.
 *  -c specify location of config file (default is ~/.snaprc)
 *  -e just extract sets in DST.
-*  -m \<machine\> use \<machine\> instead of what 'machine' returns.
-*  -v \<version\> used to force snap to use \<version\> (examples: snapshots or 5.3).
-*  -V \<setversion\> used to force snap to use \<setversion\> for sets (example: -V 5.3). Note: this will only append 53 to sets, ie base53.tgz.
+*  -d just download sets to DST, verify and exit.
+*  -m <machine> use <machine> instead of what 'machine' returns.
+*  -V <setversion> used to force snap to use <setversion> for sets (example: -V 5.3). Note: this will only append 53 to sets, ie base53.tgz.
 *  -r run sysmerge after extracting {x}sets. (May dump core if the snapshots have introduced ABI changes. Not recommended.)
 *  -x do not extract x11 sets.
 *  -M specify a mirror to use (example: " -M ftp3.usa.openbsd.org")
@@ -61,24 +58,35 @@ Usage
 * **FTP_OPTS**: *-V*
 * **MERGE**: *false*
 * **NO_X11**: *false*
-* **VER**: *uname -r*
+* **VER**: *"uname -r*
 * **CHK_UPDATE**: *false*
 * **INS_UPDATE**: *false*
-* **INSTBOOT**: ** (no default, set to disk that has bootstrap installed, sd0 for example)
-* **REBOOT**: ** (no default, setting will cause a reboot once the upgrade is complete.)
-* **MIRROR**: *ftp3.usa.openbsd.org*
-* **AFTER**: ** (no default) script to be copied to `/etc/rc.firsttime`. This script should be kept in a safe place!
+* **INSTBOOT**: *(no default, set to disk that has bootstrap installed, sd0 for example)
+*
+* **REBOOT**: *(no default, setting will cause a reboot once the upgrade is complete.)*
+* **AFTER**: *false*
+* **MIRROR**: *(no default) script to be copied to `/etc/rc.firsttime`. This script should be kept in a safe place!*
 
 Examples
 ========
+  To upgrade to the latest snapshots:
+
+    $ doas snap
+
   To update to the latest snapshot using an explicit mirror
   region:
 
-    snap -s -M ftp3.usa.openbsd.org
+    $ doas snap -M ftp3.usa.openbsd.org
 
-  To update to the lastest version of 5.3 without updating xsets:
+  To update to the snapshot without updating xsets:
 
-    snap -v 5.3 -V 5.3 -x -M ftp3.usa.openbsd.org
+    $ doas snap -x
+
+  When a new beta is cut, the system version jumps from X.Y to X.Z.
+  When this happens, snap will need to be told what the new version
+  is:
+
+    $ doas snap -V 6.1
 
 Sample .snaprc
 ==============
