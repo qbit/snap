@@ -1,0 +1,300 @@
+.\"	$OpenBSD$
+.\"
+.\" Copyright (c) 2012-17 Aaron Bieber <aaron@bolddaemon.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate: September 19 2012 $
+.Dt SNAP 8
+.Os
+.Sh NAME
+.Nm snap
+.Nd snapshot upgrade tool
+.Sh SYNOPSIS
+.Nm snap
+.Op Fl BdehiIkKnrRsSuUx
+.Op Fl b Op device
+.Op Fl c Op config_file
+.Op Fl D Op destination
+.Op Fl m Op machine
+.Op Fl M Op mirror
+.Op Fl V Op version
+.Sh DESCRIPTION
+.Nm
+is a
+.Xr ksh 1
+script designed upgrade an OpenBSD machine to the latest snapshots
+available.
+.Pp
+.Nm
+checks the `BUILDINFO` file located on the remote mirror, and will
+warn you if the snapshot is not newer than the currently running
+version.
+.Pp
+By default
+.Nm
+verifies the signature for the set files it downloads.
+This can be overwritten by specifying the
+.Fl S
+option, however, skipping verification is very much not recommended!
+.Pp
+The options are as follows:
+.Bl -tag -width Ds
+.It Fl D Op destination
+Destination directory to place the `.tgz` files.
+.It Fl S
+Skip signature verification.
+This is not recommended!
+.It Fl c Op Ar config_file
+Location of configuration file (default is
+.Pa $HOME/.snaprc
+).
+.It Fl e
+Extract sets into destination directory and exit.
+The destination directory can be overwritten by the
+.Fl D
+option, or by setting the DST line in
+.Pa $HOME/.snaprc .
+.It Fl d
+Download sets to the destination directory, verify (
+.Fl S
+prevents signature verification) and
+exit.
+By default the destination directory is set to
+.Pa /tmp/upgrade
+.It Fl m Op machine
+Use
+.Nm machine
+instead of what the `machine` command returns.
+.It Fl V Op setversion
+Use to specify a specific version of sets.
+This option will need to be used when there is a version jump, say from 6.0 to 6.1.
+.It Fl r
+Run sysmerge after extracting {x}sets.
+This option may cause issues if the newer snapshots introduce ABI changes.
+Not recommended.
+.It Fl x
+Do not extract x11 sets.
+.It Fl M Op mirror
+Specify which mirror to use.
+.It Fl I Op sigfile
+Verify integrity of the
+.Nm
+tool.
+If
+.Nm sigfile
+is omitted,
+.Nm
+will pull a copy of SHA256.sig from the GitHub page.
+.It Fl i
+Run in interactive mode (has colors).
+.It Fl n
+Force snap to install
+.Nm bsd.mp
+as
+.Pa /bsd
+.It Fl k
+Only install the kernels and exit.
+.It Fl B
+Prevent
+.Nm
+from making a backup of the kernel files.
+.It Fl u
+Check for update to the
+.Nm
+script.
+.It Fl U
+Download and install the latest version of
+.Nm
+(will overwrite currently installed version).
+Signature verification is also done.
+.It Fl b Op device
+Tells
+.Nm
+which
+.Nm device
+to install bootstrap on.
+.It Fl R
+Reboot after running
+.Nm
+.It Fl h
+Help.
+.El
+.Sh FILES
+.Bl -tag -width "$HOME/.snaprc"
+.It Pa $HOME/.snaprc
+Contains configuration options.
+See
+.Sx SNAPRC
+for more information on these options.
+.El
+.Sh SNAPRC
+.Nm
+supports the following configuration options via the
+.Pa $HOME/.snaprc
+file:
+.Bl -tag -width Ds
+.It Cm INTERACTIVE bool
+If true,
+.Nm
+will operate as if
+.Fl i
+was specified.
+Defaults to false.
+.It Cm DST directory
+Tell
+.Nm
+where to download the snapshot sets and signature files.
+Defaults to
+.Pa /tmp/upgrade
+.It Cm EXTRACT_ONLY bool
+Tells
+.Nm
+to exit after extracting the sets.
+Defaults to false.
+.It Cm FTP_OPTS string
+Lets you overwrite the options passed to
+.Xr ftp 1 .
+This can be handy if your mirror supports file continuation!
+Defaults to: " -V ".
+.Pp
+See
+.Xr ftp 1
+for options.
+.It Cm MERGE bool
+Tell
+.Nm
+to merge files in
+.Pa /etc
+using the
+.Xr sysmerge 8
+utility.
+Defaults to false.
+.It Cm NO_X11 bool
+Tell
+.Nm
+to forgo download and extraction of xsets.
+Defaults to false.
+.It Cm REBOOT bool
+Setting this to `true` will cause
+.Nm
+to reboot the system after successful extraction of sets.
+Defaults to false.
+.It Cm AFTER script
+Specifies a script to be copied to
+.Pa /etc/rc.firsttime .
+The script will then be executed upon successful reboot.
+Default is not set.
+.It Cm MIRROR string
+Defaults to `ftp3.usa.openbsd.org`.
+.El
+.Sh EXAMPLES
+.Ss EXAMPLE USAGE
+To upgrade to the latest snapshot:
+.Bd -literal -offset indent
+$ doas snap
+.Ed
+.Pp
+To upgrade to the latest snapshot using an explicit mirror region:
+.Bd -literal -offset indent
+$ doas snap -M ftp3.usa.openbsd.org
+.Ed
+.Pp
+To upgrade to a snapshot without updating xsets:
+.Bd -literal -offset indent
+$ doas snap -x
+.Ed
+.Ss EXAMPLE SNAPRC
+A typical
+.Pa ~/.snaprc
+would look something like this:
+.Bd -literal -offset indent
+INTERACTIVE:true
+MERGE:true
+AFTER:/etc/after_snap
+MIRROR:ftp3.usa.openbsd.org
+FTP_OPTS:-C -V
+.Ed
+.Ss EXAMPLE AFTER SCRIPT
+Here is an `AFTER` script that makes sure we have the latest devices
+in
+.Pa /dev ,
+upgrades all the firmware currently installed and upgrades currently
+installed packages:
+.Bd -literal -offset indent
+#!/bin/sh
+(
+    cd /dev && sh MAKEDEV all
+    /usr/sbin/fw_update -v
+    /usr/sbin/pkg_add -um # -m is needed to see progress in this context
+)
+.Ed
+.Sh SIGNATURE VERIFICATION
+.Nm
+can be verified using the
+.Nm signify
+utility.
+.Ss Public key:
+.Bd -literal
+untrusted comment: github.com/qbit/snap public key
+RWQVGN6sUjQQA5uYpANGLLKQMAERZ43otLePFSVqNFGGtf/qBez7G1WU
+.Ed
+.Ss SIGNATURE URL
+.Bd -literal
+https://raw.githubusercontent.com/qbit/snap/master/SHA256.sig
+.Ed
+.Pp
+After installing the above public key in
+.Pa /etc/signify/snap.pub
+and downloading the
+.Pa SHA256.sig
+file, you can verify
+.Nm
+by running one the following:
+.Pp
+Have snap download the
+.Pa SHA256.sig
+file and run verification:
+.Bd -literal -offset indent
+$ snap -I
+.Ed
+.Pp
+Have snap verify a pre-downloaded
+.Pa SHA256.sig
+file:
+.Bd -literal -offset indent
+$ snap -I SHA256.sig
+.Ed
+.Pp
+Manual verification with the
+.Nm signify
+utility:
+.Bd -literal -offset indent
+$ signify -C -p /etc/signify/snap.pub -x SHA256.sig snap
+.Ed
+.Sh SEE ALSO
+.Xr ftp 1 ,
+.Xr signify 1 ,
+.Xr installboot 8 ,
+.Xr rc 8 ,
+.Xr release 8 ,
+.Xr sysmerge 8
+.Sh HISTORY
+The first version of
+.Nm
+was released in September of 2012.
+.Sh AUTHORS
+.An -nosplit
+.Nm
+was written by
+.An Aaron Bieber Aq Mt aaron@bolddaemon.com .

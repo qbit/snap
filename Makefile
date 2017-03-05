@@ -1,9 +1,17 @@
-PREFIX ?= /usr/local
+#	$OpenBSD$
 
-help:
-	@awk 'BEGIN{print "Usage\n====="} /^  -/ {print "*"$$0}' ./snap
-	@echo
-	@awk 'BEGIN{print ".snaprc options and defaults\n======="} /\(get_conf_var/ {gsub("\x27|\\)", "", $$0); print "* **"$$2"**: " "*"$$5"*"}' ./snap
+PREFIX ?=	/usr/local
+SCRIPT =	snap
+MAN =		snap.8
+MANDIR ?=	${PREFIX}/man/man
+
+README.md:
+	mandoc -T lint snap.8
+	mandoc -T markdown snap.8 >$@
+
+snap.8:
+	mandoc -T lint snap.8
+	mandoc -T ascii snap.8 >$@
 
 sign:
 	@sha256 snap > SHA256
@@ -23,7 +31,8 @@ release: bump sign
 	git tag $${VERSION}; \
 	git push --tags
 
-install:
+realinstall:
 	install -d $(DESTDIR)$(PREFIX)/bin
 	install -m 755 snap $(DESTDIR)$(PREFIX)/bin/snap
 
+.include <bsd.prog.mk>
