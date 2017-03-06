@@ -50,12 +50,12 @@ option, however, skipping verification is very much not recommended!
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
-.It Fl D Op destination
+.It Fl D Ar destination
 Destination directory to place the `.tgz` files.
 .It Fl S
 Skip signature verification.
 This is not recommended!
-.It Fl c Op Ar config_file
+.It Fl c Ar config_file
 Location of configuration file (default is
 .Pa $HOME/.snaprc
 ).
@@ -72,11 +72,11 @@ prevents signature verification) and
 exit.
 By default the destination directory is set to
 .Pa /tmp/upgrade
-.It Fl m Op machine
+.It Fl m Ar machine
 Use
 .Nm machine
 instead of what the `machine` command returns.
-.It Fl V Op setversion
+.It Fl V Ar setversion
 Use to specify a specific version of sets.
 This option will need to be used when there is a version jump, say from 6.0 to 6.1.
 .It Fl r
@@ -85,9 +85,9 @@ This option may cause issues if the newer snapshots introduce ABI changes.
 Not recommended.
 .It Fl x
 Do not extract x11 sets.
-.It Fl M Op mirror
+.It Fl M Ar mirror
 Specify which mirror to use.
-.It Fl I Op sigfile
+.It Fl I Ar sigfile
 Verify integrity of the
 .Nm
 tool.
@@ -118,7 +118,7 @@ Download and install the latest version of
 .Nm
 (will overwrite currently installed version).
 Signature verification is also done.
-.It Fl b Op device
+.It Fl b Ar device
 Tells
 .Nm
 which

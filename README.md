@@ -37,7 +37,7 @@ option, however, skipping verification is very much not recommended!
 
 The options are as follows:
 
-**-D** \[destination]
+**-D** *destination*
 
 >Destination directory to place the \`.tgz\` files.
 
@@ -46,7 +46,7 @@ The options are as follows:
 >Skip signature verification.
 >This is not recommended!
 
-**-c** \[*config\_file*]
+**-c** *config\_file*
 
 >Location of configuration file (default is
 >*$HOME/.snaprc*
@@ -69,13 +69,13 @@ The options are as follows:
 >By default the destination directory is set to
 >*/tmp/upgrade*
 
-**-m** \[machine]
+**-m** *machine*
 
 >Use
 >**machine**
 >instead of what the \`machine\` command returns.
 
-**-V** \[setversion]
+**-V** *setversion*
 
 >Use to specify a specific version of sets.
 >This option will need to be used when there is a version jump, say from 6.0 to 6.1.
@@ -90,11 +90,11 @@ The options are as follows:
 
 >Do not extract x11 sets.
 
-**-M** \[mirror]
+**-M** *mirror*
 
 >Specify which mirror to use.
 
-**-I** \[sigfile]
+**-I** *sigfile*
 
 >Verify integrity of the
 >**snap**
@@ -139,7 +139,7 @@ The options are as follows:
 >(will overwrite currently installed version).
 >Signature verification is also done.
 
-**-b** \[device]
+**-b** *device*
 
 >Tells
 >**snap**
@@ -349,4 +349,4 @@ was released in September of 2012.
 was written by
 Aaron Bieber &lt;<aaron@bolddaemon.com>&gt;.
 
-OpenBSD 6.0 - September 19, 2012
+OpenBSD 6.1 - September 19, 2012
