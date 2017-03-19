@@ -39,131 +39,131 @@ The options are as follows:
 
 **-D** *destination*
 
->Destination directory to place the \`.tgz\` files.
+> Destination directory to place the \`.tgz\` files.
 
 **-S**
 
->Skip signature verification.
->This is not recommended!
+> Skip signature verification.
+> This is not recommended!
 
 **-c** *config\_file*
 
->Location of configuration file (default is
->*$HOME/.snaprc*
->).
+> Location of configuration file (default is
+> *$HOME/.snaprc*
+> ).
 
 **-e**
 
->Extract sets into destination directory and exit.
->The destination directory can be overwritten by the
->**-D**
->option, or by setting the DST line in
->*$HOME/.snaprc*.
+> Extract sets into destination directory and exit.
+> The destination directory can be overwritten by the
+> **-D**
+> option, or by setting the DST line in
+> *$HOME/.snaprc*.
 
 **-d**
 
->Download sets to the destination directory, verify (
->**-S**
->prevents signature verification) and
->exit.
->By default the destination directory is set to
->*/tmp/upgrade*
+> Download sets to the destination directory, verify (
+> **-S**
+> prevents signature verification) and
+> exit.
+> By default the destination directory is set to
+> */tmp/upgrade*
 
 **-m** *machine*
 
->Use
->**machine**
->instead of what the \`machine\` command returns.
+> Use
+> **machine**
+> instead of what the \`machine\` command returns.
 
 **-V** *setversion*
 
->Use to specify a specific version of sets.
->This option will need to be used when there is a version jump, say from 6.0 to 6.1.
+> Use to specify a specific version of sets.
+> This option will need to be used when there is a version jump, say from 6.0 to 6.1.
 
 **-r**
 
->Run sysmerge after extracting {x}sets.
->This option may cause issues if the newer snapshots introduce ABI changes.
->Not recommended.
+> Run sysmerge after extracting {x}sets.
+> This option may cause issues if the newer snapshots introduce ABI changes.
+> Not recommended.
 
 **-x**
 
->Do not extract x11 sets.
+> Do not extract x11 sets.
 
 **-M** *mirror*
 
->Specify which mirror to use.
+> Specify which mirror to use.
 
 **-I** *sigfile*
 
->Verify integrity of the
->**snap**
->tool.
->If
->**sigfile**
->is omitted,
->**snap**
->will pull a copy of SHA256.sig from the GitHub page.
+> Verify integrity of the
+> **snap**
+> tool.
+> If
+> **sigfile**
+> is omitted,
+> **snap**
+> will pull a copy of SHA256.sig from the GitHub page.
 
 **-i**
 
->Run in interactive mode (has colors).
+> Run in interactive mode (has colors).
 
 **-n**
 
->Force snap to install
->**bsd.mp**
->as
->*/bsd*
+> Force snap to install
+> **bsd.mp**
+> as
+> */bsd*
 
 **-k**
 
->Only install the kernels and exit.
+> Only install the kernels and exit.
 
 **-B**
 
->Prevent
->**snap**
->from making a backup of the kernel files.
+> Prevent
+> **snap**
+> from making a backup of the kernel files.
 
 **-u**
 
->Check for update to the
->**snap**
->script.
+> Check for update to the
+> **snap**
+> script.
 
 **-U**
 
->Download and install the latest version of
->**snap**
->(will overwrite currently installed version).
->Signature verification is also done.
+> Download and install the latest version of
+> **snap**
+> (will overwrite currently installed version).
+> Signature verification is also done.
 
 **-b** *device*
 
->Tells
->**snap**
->which
->**device**
->to install bootstrap on.
+> Tells
+> **snap**
+> which
+> **device**
+> to install bootstrap on.
 
 **-R**
 
->Reboot after running
->**snap**
+> Reboot after running
+> **snap**
 
 **-h**
 
->Help.
+> Help.
 
 # FILES
 
 *$HOME/.snaprc*
 
->Contains configuration options.
->See
->*SNAPRC*
->for more information on these options.
+> Contains configuration options.
+> See
+> *SNAPRC*
+> for more information on these options.
 
 # SNAPRC
 
@@ -174,74 +174,74 @@ file:
 
 **INTERACTIVE bool**
 
->If true,
->**snap**
->will operate as if
->**-i**
->was specified.
->Defaults to false.
+> If true,
+> **snap**
+> will operate as if
+> **-i**
+> was specified.
+> Defaults to false.
 
 **DST directory**
 
->Tell
->**snap**
->where to download the snapshot sets and signature files.
->Defaults to
->*/tmp/upgrade*
+> Tell
+> **snap**
+> where to download the snapshot sets and signature files.
+> Defaults to
+> */tmp/upgrade*
 
 **EXTRACT\_ONLY bool**
 
->Tells
->**snap**
->to exit after extracting the sets.
->Defaults to false.
+> Tells
+> **snap**
+> to exit after extracting the sets.
+> Defaults to false.
 
 **FTP\_OPTS string**
 
->Lets you overwrite the options passed to
->ftp(1).
->This can be handy if your mirror supports file continuation!
->Defaults to: " -V ".
+> Lets you overwrite the options passed to
+> ftp(1).
+> This can be handy if your mirror supports file continuation!
+> Defaults to: " -V ".
 
->See
->ftp(1)
->for options.
+> See
+> ftp(1)
+> for options.
 
 **MERGE bool**
 
->Tell
->**snap**
->to merge files in
->*/etc*
->using the
->sysmerge(8)
->utility.
->Defaults to false.
+> Tell
+> **snap**
+> to merge files in
+> */etc*
+> using the
+> sysmerge(8)
+> utility.
+> Defaults to false.
 
 **NO\_X11 bool**
 
->Tell
->**snap**
->to forgo download and extraction of xsets.
->Defaults to false.
+> Tell
+> **snap**
+> to forgo download and extraction of xsets.
+> Defaults to false.
 
 **REBOOT bool**
 
->Setting this to \`true\` will cause
->**snap**
->to reboot the system after successful extraction of sets.
->Defaults to false.
+> Setting this to \`true\` will cause
+> **snap**
+> to reboot the system after successful extraction of sets.
+> Defaults to false.
 
 **AFTER script**
 
->Specifies a script to be copied to
->*/etc/rc.firsttime*.
->The script will then be executed upon successful reboot.
->Default is not set.
+> Specifies a script to be copied to
+> */etc/rc.firsttime*.
+> The script will then be executed upon successful reboot.
+> Default is not set.
 
 **MIRROR string**
 
->Defaults to \`ftp3.usa.openbsd.org\`.
+> Defaults to \`ftp3.usa.openbsd.org\`.
 
 # EXAMPLES
 
@@ -283,7 +283,7 @@ installed packages:
 	(
 	    cd /dev && sh MAKEDEV all
 	    /usr/sbin/fw_update -v
-	    /usr/sbin/pkg_add -um # -m is needed to see progress in this context
+	    /usr/sbin/pkg_add -uVm # -m is needed to see progress in this context
 	)
 
 # SIGNATURE VERIFICATION
@@ -347,6 +347,6 @@ was released in September of 2012.
 
 **snap**
 was written by
-Aaron Bieber &lt;<aaron@bolddaemon.com>&gt;.
+Aaron Bieber &lt;[aaron@bolddaemon.com](mailto:aaron@bolddaemon.com)&gt;.
 
 OpenBSD 6.1 - September 19, 2012
