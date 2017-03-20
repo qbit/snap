@@ -20,7 +20,7 @@ SNAP(8) - System Manager's Manual
 **snap**
 is a
 ksh(1)
-script designed upgrade an OpenBSD machine to the latest snapshots
+script designed upgrade an OpenBSD machine to the latest snapshot
 available.
 
 **snap**
@@ -31,7 +31,7 @@ version.
 By default
 **snap**
 verifies the signature for the set files it downloads.
-This can be overwritten by specifying the
+This can be prevented by specifying the
 **-S**
 option, however, skipping verification is very much not recommended!
 
