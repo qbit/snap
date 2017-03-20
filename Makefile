@@ -32,7 +32,7 @@ release: bump sign
 	git push --tags
 
 realinstall:
-	install -d $(DESTDIR)$(PREFIX)/bin
-	install -m 755 snap $(DESTDIR)$(PREFIX)/bin/snap
+	${INSTALL} ${INSTALL_COPY} -o ${BINOWN} -g ${BINGRP} -m ${BINMODE} \
+		${.CURDIR}/${SCRIPT} ${DESTDIR}${BINDIR}/snap
 
 .include <bsd.prog.mk>
