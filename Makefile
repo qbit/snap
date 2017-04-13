@@ -4,6 +4,7 @@ PREFIX ?=	/usr/local
 SCRIPT =	snap
 MAN =		snap.8
 MANDIR ?=	${PREFIX}/man/man
+BINDIR ?=	${PREFIX}/bin
 
 README.md:
 	mandoc -T lint snap.8
