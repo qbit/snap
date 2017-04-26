@@ -3,7 +3,7 @@
 set -eu
 
 # 1.1.2
-version=1.1.2
+version=master
 
 red="\033[01;31m"
 yellow="\033[01;33m"
