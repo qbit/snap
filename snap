@@ -476,7 +476,7 @@ fi
                 KERNEL=${bsds[1]}
             fi
 
-            if [ "${NO_KBACKUPS:=false}" == true ]; then
+            if [ "${NO_KBACKUPS:=false}" == false ]; then
                 if [ $DOWNLOAD_ONLY == false ]; then
                     backup
                 fi
