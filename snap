@@ -435,7 +435,7 @@ fi
     cd -- "$DST" || exit 1
 
     # first element should be bsd, second should be mp for given kernel names.
-    if [ "${MACHINE}" == "armv7" ]; then
+    if [[ "${MACHINE}" == arm* ]]; then
 	# Currently there is no bsd.mp
 	set -A bsds "bsd" "" "bsd.rd"
     else
