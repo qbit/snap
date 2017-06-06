@@ -28,7 +28,7 @@ bump:
 release: bump sign
 	VERSION=$$(awk -F= '/^version/ {print $$2}' snap); \
 	git add snap SHA256 SHA256.sig; \
-	git commit -m '$${VERSION}'; \
+	git commit -m "$${VERSION}"; \
 	git tag $${VERSION}; \
 	git push --tags
 
