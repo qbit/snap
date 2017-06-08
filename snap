@@ -311,7 +311,7 @@ REBOOT=$(get_conf_var 'REBOOT' || echo 'false')
 AFTER=$(get_conf_var 'AFTER' || echo 'false')
 DOWNLOAD_ONLY=false
 
-MIRROR=$(get_conf_var 'MIRROR' || echo 'ftp3.usa.openbsd.org')
+MIRROR=$(get_conf_var 'MIRROR' || cat /etc/installurl | awk -F/ '{print $3}')
 
 while getopts "b:Bc:dD:ehiIkKm:M:nrRsSuUV:x" arg; do
     case $arg in
