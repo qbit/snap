@@ -253,6 +253,8 @@ function update_kernel {
     cp ${KERNEL} /bsd || FAIL=1
     cp ${RD} /bsd.rd || FAIL=1
 
+    (umask 077; sha256 /bsd > /var/db/kernel.SHA256)
+
     if [ "${KERNEL}" == "bsd.mp" ]; then
 	cp bsd /bsd.sp || FAIL=1
     fi
@@ -535,6 +537,9 @@ fi
 	chmod +x /etc/rc.sysmerge
 	echo "Don't forget to run sysmerge!"
     fi
+
+    echo -n "Relinking to create unique kernel..."
+    /usr/libexec/reorder_kernel && echo "done." || echo "failed."
 
     if [ $INSTBOOT != false ]; then
 	msg "Installing bootstrap on ${INSTBOOT}"
