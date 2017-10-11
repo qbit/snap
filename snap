@@ -439,7 +439,7 @@ fi
     cd -- "$DST" || exit 1
 
     # first element should be bsd, second should be mp for given kernel names.
-    if [ "${MACHINE}" == arm* ] || [ "${MACHINE}" == loongson ]; then
+    if [[ "${MACHINE}" == arm* ]] || [[ "${MACHINE}" == loongson ]]; then
 	# Currently there is no bsd.mp
 	set -A bsds "bsd" "" "bsd.rd"
     else
