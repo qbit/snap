@@ -20,7 +20,7 @@ SNAP(8) - System Manager's Manual
 **snap**
 is a
 ksh(1)
-script designed upgrade an OpenBSD machine to the latest snapshot
+script designed to upgrade an OpenBSD machine to the latest snapshot
 available.
 
 **snap**
@@ -30,7 +30,7 @@ version.
 
 By default
 **snap**
-verifies the signature for the set files it downloads.
+verifies signatures for the set files it downloads.
 This can be prevented by specifying the
 **-S**
 option, however, skipping verification is very much not recommended!
@@ -83,7 +83,7 @@ The options are as follows:
 **-r**
 
 > Run sysmerge after extracting {x}sets.
-> This option may cause issues if the newer snapshots introduce ABI changes.
+> This option may cause issues if the newer snapshot introduces ABI changes.
 > Not recommended.
 
 **-x**
@@ -183,7 +183,7 @@ file:
 
 **DST directory**
 
-> Tell
+> Tells
 > **snap**
 > where to download the snapshot sets and signature files.
 > Defaults to
@@ -209,7 +209,7 @@ file:
 
 **MERGE bool**
 
-> Tell
+> Tells
 > **snap**
 > to merge files in
 > */etc*
@@ -220,7 +220,7 @@ file:
 
 **NO\_X11 bool**
 
-> Tell
+> Tells
 > **snap**
 > to forgo download and extraction of xsets.
 > Defaults to false.
