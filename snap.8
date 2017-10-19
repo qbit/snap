@@ -33,7 +33,7 @@
 .Nm
 is a
 .Xr ksh 1
-script designed upgrade an OpenBSD machine to the latest snapshot
+script designed to upgrade an OpenBSD machine to the latest snapshot
 available.
 .Pp
 .Nm
@@ -43,7 +43,7 @@ version.
 .Pp
 By default
 .Nm
-verifies the signature for the set files it downloads.
+verifies signatures for the set files it downloads.
 This can be prevented by specifying the
 .Fl S
 option, however, skipping verification is very much not recommended!
@@ -81,7 +81,7 @@ Use to specify a specific version of sets.
 This option will need to be used when there is a version jump, say from 6.0 to 6.1.
 .It Fl r
 Run sysmerge after extracting {x}sets.
-This option may cause issues if the newer snapshots introduce ABI changes.
+This option may cause issues if the newer snapshot introduces ABI changes.
 Not recommended.
 .It Fl x
 Do not extract x11 sets.
@@ -152,7 +152,7 @@ will operate as if
 was specified.
 Defaults to false.
 .It Cm DST directory
-Tell
+Tells
 .Nm
 where to download the snapshot sets and signature files.
 Defaults to
@@ -172,7 +172,7 @@ See
 .Xr ftp 1
 for options.
 .It Cm MERGE bool
-Tell
+Tells
 .Nm
 to merge files in
 .Pa /etc
@@ -181,7 +181,7 @@ using the
 utility.
 Defaults to false.
 .It Cm NO_X11 bool
-Tell
+Tells
 .Nm
 to forgo download and extraction of xsets.
 Defaults to false.
