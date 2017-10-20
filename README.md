@@ -20,8 +20,9 @@ SNAP(8) - System Manager's Manual
 **snap**
 is a
 ksh(1)
-script designed upgrade an OpenBSD machine to the latest snapshot
-available.
+script designed to upgrade an
+OpenBSD OpenBSD
+machine to the latest snapshot available.
 
 **snap**
 checks the \`BUILDINFO\` file located on the remote mirror, and will
@@ -30,7 +31,7 @@ version.
 
 By default
 **snap**
-verifies the signature for the set files it downloads.
+verifies signatures for the set files it downloads.
 This can be prevented by specifying the
 **-S**
 option, however, skipping verification is very much not recommended!
@@ -83,7 +84,7 @@ The options are as follows:
 **-r**
 
 > Run sysmerge after extracting {x}sets.
-> This option may cause issues if the newer snapshots introduce ABI changes.
+> This option may cause issues if the newer snapshot introduces ABI changes.
 > Not recommended.
 
 **-x**
@@ -183,7 +184,7 @@ file:
 
 **DST directory**
 
-> Tell
+> Tells
 > **snap**
 > where to download the snapshot sets and signature files.
 > Defaults to
@@ -209,7 +210,7 @@ file:
 
 **MERGE bool**
 
-> Tell
+> Tells
 > **snap**
 > to merge files in
 > */etc*
@@ -220,7 +221,7 @@ file:
 
 **NO\_X11 bool**
 
-> Tell
+> Tells
 > **snap**
 > to forgo download and extraction of xsets.
 > Defaults to false.
@@ -293,7 +294,7 @@ can be verified using the
 **signify**
 utility.
 
-## Public key:
+## Public key
 
 	untrusted comment: github.com/qbit/snap public key
 	RWQVGN6sUjQQA5uYpANGLLKQMAERZ43otLePFSVqNFGGtf/qBez7G1WU
@@ -349,4 +350,4 @@ was released in September of 2012.
 was written by
 Aaron Bieber &lt;[aaron@bolddaemon.com](mailto:aaron@bolddaemon.com)&gt;.
 
-OpenBSD 6.1 - September 19, 2012
+OpenBSD 6.2 - September 19, 2012
