@@ -21,7 +21,7 @@ SNAP(8) - System Manager's Manual
 is a
 ksh(1)
 script designed to upgrade an
-OpenBSD OpenBSD
+OpenBSD
 machine to the latest snapshot available.
 
 **snap**
