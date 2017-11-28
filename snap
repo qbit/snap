@@ -304,7 +304,7 @@ MACHINE=$(machine)
 MERGE=$(get_conf_var 'MERGE' || echo 'false')
 NO_X11=$(get_conf_var 'NO_X11' || echo 'false')
 SETVER=$(uname -r | tr -d \.)
-VER=$(get_conf_var 'VER' || echo "$(uname -r)")
+VER="snapshots"
 CHK_INTEG=false
 CHK_UPDATE=$(get_conf_var 'CHK_UPDATE' || echo 'false')
 INS_UPDATE=$(get_conf_var 'INS_UPDATE' || echo 'false')
@@ -411,14 +411,6 @@ if [ $CHK_UPDATE == true ]; then
 fi
 
 [[ $(id -u) -ne 0 ]] && error "need root privileges" false
-
-if [ $VER != "snapshots" ]; then
-    kern_ver=$(sysctl kern.version | grep -oE "\-(current|beta)")
-    if [ $? == 0 ]; then
-        msg "kern.version: ${white}reporting as $kern_ver on ${MACHINE}"
-        VER='snapshots'
-    fi
-fi
 
 mkdir -p -- "$DST" || exit 1
 

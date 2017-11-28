@@ -23,6 +23,7 @@ ksh(1)
 script designed to upgrade an
 OpenBSD
 machine to the latest snapshot available.
+Upgrading from release to release is not supported.
 
 **snap**
 checks the \`BUILDINFO\` file located on the remote mirror, and will
