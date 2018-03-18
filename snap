@@ -48,6 +48,7 @@ snap options:
   -U download new snap script (will replace currently installed version).
   -b device to install bootstrap to.
   -R reboot after installation.
+  -W exit on warn
   -h help.
 
  Examples:
@@ -103,8 +104,11 @@ function msg {
 }
 
 function warn {
-    if [ $INTERACTIVE == true ]; then
+    if [[ $INTERACTIVE == true ]] || [[ $WEXIT == true ]]; then
 	echo "${yellow}${1}${white}"
+	if [ $WEXIT == true ]; then
+	    exit 1
+        fi
     fi
 }
 
@@ -312,12 +316,13 @@ INSTBOOT=$(get_conf_var 'INSTBOOT' || echo 'false')
 REBOOT=$(get_conf_var 'REBOOT' || echo 'false')
 AFTER=$(get_conf_var 'AFTER' || echo 'false')
 DOWNLOAD_ONLY=false
+WEXIT=$(get_conf_var 'WEXIT' || echo 'false')
 
 MIRROR=$(get_conf_var 'MIRROR' || \
 	awk -F/ 'match($3, /[a-z]/) {print $3}' /etc/installurl 2> /dev/null || \
 	echo "ftp3.usa.openbsd.org")
 
-while getopts "b:Bc:dD:ehiIkKm:M:nrRsSuUV:x" arg; do
+while getopts "b:Bc:dD:ehiIkKm:M:nrRsSuUV:wx" arg; do
     case $arg in
 	b)
 	    INSTBOOT=$OPTARG
@@ -386,6 +391,9 @@ while getopts "b:Bc:dD:ehiIkKm:M:nrRsSuUV:x" arg; do
 	    ;;
 	V)
 	    SETVER=$(echo $OPTARG | tr -d \.)
+	    ;;
+	W)
+	    WEXIT=true
 	    ;;
 	x)
 	    NO_X11=true
