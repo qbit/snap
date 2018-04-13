@@ -1,17 +1,20 @@
 COMMENT=	OpenBSD upgrade tool
-CATEGORIES=	sysutils
 
-VERSION=	1.1.3
-REVISION=	0
-NO_BUILD=	Yes
-PKG_ARCH=	*
 PKGNAME=	snap-${VERSION}
+PKG_ARCH=	*
+VERSION=	1.1.3
 
 GH_ACCOUNT=	qbit
 GH_PROJECT=	snap
 GH_TAGNAME=	${VERSION}
 
+CATEGORIES=	sysutils
+
+HOMEPAGE=   https://github.com/qbit/snap
+
 PERMIT_PACKAGE_CDROM=	Yes
+
+NO_BUILD=	Yes
 
 do-install:
 	${INSTALL_SCRIPT} ${WRKSRC}/snap ${PREFIX}/bin/snap
