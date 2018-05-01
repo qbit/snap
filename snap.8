@@ -198,7 +198,7 @@ Specifies a script to be copied to
 The script will then be executed upon successful reboot.
 Default is not set.
 .It Cm MIRROR string
-Defaults to `ftp3.usa.openbsd.org`.
+Defaults to `cdn.openbsd.org`.
 .El
 .Sh EXAMPLES
 .Ss EXAMPLE USAGE
@@ -209,7 +209,7 @@ $ doas snap
 .Pp
 To upgrade to the latest snapshot using an explicit mirror region:
 .Bd -literal -offset indent
-$ doas snap -M ftp3.usa.openbsd.org
+$ doas snap -M cdn.openbsd.org
 .Ed
 .Pp
 To upgrade to a snapshot without updating xsets:
@@ -224,7 +224,7 @@ would look something like this:
 INTERACTIVE:true
 MERGE:true
 AFTER:/etc/after_snap
-MIRROR:ftp3.usa.openbsd.org
+MIRROR:cdn.openbsd.org
 FTP_OPTS:-C -V
 .Ed
 .Ss EXAMPLE AFTER SCRIPT
