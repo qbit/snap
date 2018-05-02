@@ -243,7 +243,7 @@ file:
 
 **MIRROR string**
 
-> Defaults to \`ftp3.usa.openbsd.org\`.
+> Defaults to \`cdn.openbsd.org\`.
 
 # EXAMPLES
 
@@ -255,7 +255,7 @@ To upgrade to the latest snapshot:
 
 To upgrade to the latest snapshot using an explicit mirror region:
 
-	$ doas snap -M ftp3.usa.openbsd.org
+	$ doas snap -M cdn.openbsd.org
 
 To upgrade to a snapshot without updating xsets:
 
@@ -270,7 +270,7 @@ would look something like this:
 	INTERACTIVE:true
 	MERGE:true
 	AFTER:/etc/after_snap
-	MIRROR:ftp3.usa.openbsd.org
+	MIRROR:cdn.openbsd.org
 	FTP_OPTS:-C -V
 
 ## EXAMPLE AFTER SCRIPT
