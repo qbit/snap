@@ -37,7 +37,7 @@ snap options:
   -V <setversion> used to force snap to use <setversion> for sets (example: -V 5.3). Note: this will only append 53 to sets, ie base53.tgz.
   -r run sysmerge after extracting {x}sets. (May dump core if the snapshots have introduced ABI changes. Not recommended.)
   -x do not extract x11 sets.
-  -M specify a mirror to use (example: " -M ftp3.usa.openbsd.org")
+  -M specify a mirror to use (example: " -M cdn.openbsd.org")
   -I [full path to SHA256.sig file] verify integrity of snap.
   -i interactive with colors.
   -n force using bsd.mp as bsd.
@@ -60,7 +60,7 @@ snap options:
    To update to the latest snapshot using an explicit mirror
    region:
 
-     $ doas snap -M ftp3.usa.openbsd.org
+     $ doas snap -M cdn.openbsd.org
 
    To update to the snapshot without updating xsets:
 
@@ -77,7 +77,7 @@ snap options:
    INTERACTIVE:true
    DST:/tmp/upgrade
    MERGE:true
-   MIRROR:ftp3.usa.openbsd.org
+   MIRROR:cdn.openbsd.org
    NO_X11:true
 
 EOF
@@ -320,7 +320,7 @@ WEXIT=$(get_conf_var 'WEXIT' || echo 'false')
 
 MIRROR=$(get_conf_var 'MIRROR' || \
 	awk -F/ 'match($3, /[a-z]/) {print $3}' /etc/installurl 2> /dev/null || \
-	echo "ftp3.usa.openbsd.org")
+	echo "cdn.openbsd.org")
 
 while getopts "b:Bc:dD:ehiIkKm:M:nrRsSuUV:wx" arg; do
     case $arg in
