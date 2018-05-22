@@ -418,7 +418,19 @@ if [ $CHK_UPDATE == true ]; then
     exit 0
 fi
 
-[[ $(id -u) -ne 0 ]] && error "need root privileges" false
+UID=$(id -u)
+grep -q $(echo $LOGNAME) /etc/doas.conf
+UFOUND=$?
+
+PID=$$
+PROC=$(ps -o args -p ${PID} | sed 1d)
+
+if [ ${UID} -ne 0 ] && [ ${UFOUND} -eq 0 ]; then
+    doas ${PROC}
+    exit 0
+elif [[ ${UID} -ne 0 ]]; then
+    error "need root privileges"
+fi
 
 mkdir -p -- "$DST" || exit 1
 
