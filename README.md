@@ -160,6 +160,10 @@ The options are as follows:
 
 # FILES
 
+*$HOME/.last\_snap*
+
+> Contains timestamp of the previous snapshot.
+
 *$HOME/.snaprc*
 
 > Contains configuration options.
@@ -351,4 +355,4 @@ was released in September of 2012.
 was written by
 Aaron Bieber &lt;[aaron@bolddaemon.com](mailto:aaron@bolddaemon.com)&gt;.
 
-OpenBSD 6.2 - September 19, 2012
+OpenBSD 6.3 - September 19, 2012
