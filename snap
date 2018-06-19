@@ -279,11 +279,12 @@ fetch() {
 	# this check may cause signature issues.. if old files exist in
 	# the DEST directory.
 	if [ ! -e $DF ]; then
-		/usr/bin/ftp $FTP_OPTS -o $TDF $1
-	R=$?
+		su -s/bin/sh _pkgfetch -c "/usr/bin/ftp $FTP_OPTS -o $TDF $1"
+		R=$?
 
-	# move the tmp file to actual file name so we can use -C
-	mv $TDF $DF
+		# move the tmp file to actual file name so we can use -C
+		mv "$TDF" "$DF"
+		chown root:wheel "$DF"
 	fi
 
 	return $R
@@ -428,6 +429,8 @@ fi
 [[ $(id -u) -ne 0 ]] && error "need root privileges" false
 
 mkdir -p -- "$DST" || exit 1
+chown -R root:_pkgfetch "$DST"
+chmod -R g+rw "$DST"
 
 case "${MIRROR}" in
 	http://* | ftp://* | https://*)
