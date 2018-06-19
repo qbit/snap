@@ -2,17 +2,13 @@
 
 PREFIX ?=	/usr/local
 SCRIPT =	snap
-MAN =		snap.8
+MAN =		man/snap.8
 MANDIR ?=	${PREFIX}/man/man
 BINDIR ?=	${PREFIX}/bin
 
-README.md:
-	mandoc -T lint snap.8
-	mandoc -T markdown snap.8 >$@
-
-snap.8:
-	mandoc -T lint snap.8
-	mandoc -T ascii snap.8 >$@
+README.md: man/snap.8
+	mandoc -T lint man/snap.8
+	mandoc -T markdown man/snap.8 >$@
 
 sign:
 	@sha256 snap > SHA256
@@ -35,5 +31,7 @@ release: bump sign
 realinstall:
 	${INSTALL} ${INSTALL_COPY} -o ${BINOWN} -g ${BINGRP} -m ${BINMODE} \
 		${.CURDIR}/${SCRIPT} ${DESTDIR}${BINDIR}/snap
+
+.PHONY: release bump verify sign
 
 .include <bsd.prog.mk>
