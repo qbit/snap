@@ -7,8 +7,8 @@ SNAP(8) - System Manager's Manual
 # SYNOPSIS
 
 **snap**
-\[**-BdehiIkKnrRsSuUx**]
-\[**-b**&nbsp;\[device]]
+\[**-bBcdDehiIkKmMnrRsSuUvWx**]
+\[**-b**&nbsp;\[boot&nbsp;device]]
 \[**-c**&nbsp;\[config\_file]]
 \[**-D**&nbsp;\[destination]]
 \[**-m**&nbsp;\[machine]]
