@@ -430,7 +430,7 @@ fi
 
 mkdir -p -- "$DST" || exit 1
 chown -R root:_pkgfetch "$DST"
-chmod -R g+rw "$DST"
+chmod -R g+rwx "$DST"
 
 case "${MIRROR}" in
 	http://* | ftp://* | https://*)
