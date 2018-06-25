@@ -295,12 +295,9 @@ extract() {
 		|| error "Failed to extract ${1}" false
 }
 
+CONF_FILE="/etc/snap.conf"
 if [ -e ~/.snaprc ]; then
 	CONF_FILE=~/.snaprc
-else
-	if [ -e /etc/snap.conf ]; then
-		CONF_FILE=/etc/snap.conf
-	fi
 fi
 
 SKIP_SIGN=false
