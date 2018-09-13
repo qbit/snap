@@ -329,7 +329,7 @@ MIRROR=$(get_conf_var 'MIRROR' || \
 	awk -F/ 'match($3, /[a-z]/) {print $3}' /etc/installurl 2> /dev/null || \
 	echo "cdn.openbsd.org")
 
-while getopts "Cb:Bc:dD:ehiIkKm:M:nrRsSuUV:Wx" arg; do
+while getopts "b:BCc:dD:ehiIkKm:M:nrRsSuUV:Wx" arg; do
 	case $arg in
 		b)
 			INSTBOOT=$OPTARG
