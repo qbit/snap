@@ -11,6 +11,8 @@ green="\\033[01;32m"
 bold="\\033[01;39m"
 white="\\033[0m"
 
+COLOR=true
+
 tmp_template="snap.XXXXXXXXXX"
 
 sets=""
@@ -180,9 +182,9 @@ backup() {
 		error "Failed to backup" false
 	else
 		msg "Backed up the following:
-	${bold}/bsd => /obsd
+	/bsd => /obsd
 	/bsd.rd => /obsd.rd
-	/sbin/reboot => /sbin/oreboot${green}"
+	/sbin/reboot => /sbin/oreboot"
 	fi
 }
 
@@ -201,9 +203,9 @@ rollback() {
 		error "Failed to rollback" false
 	else
 		msg "Restored the old files for the following:
-	${bold}/bsd => /obsd
+	/bsd => /obsd
 	/bsd.rd => /obsd.rd
-	/sbin/reboot => /sbin/oreboot${green}"
+	/sbin/reboot => /sbin/oreboot"
 	fi
 
 }
@@ -270,7 +272,7 @@ update_kernel() {
 		error "Failed to copy new kernel" false
 	else
 		msg "Set primary kernel to ${KERNEL}:
-		${KERNEL} => /bsd"
+	${KERNEL} => /bsd"
 	fi
 }
 
@@ -303,6 +305,7 @@ if [ -e ~/.snaprc ]; then
 	CONF_FILE=~/.snaprc
 fi
 
+COLOR=$(get_conf_var 'COLOR' || echo 'true')
 SKIP_SIGN=false
 USE_BUILDINFO=true
 CPUS=$(sysctl -n hw.ncpu)
@@ -326,6 +329,13 @@ AFTER=$(get_conf_var 'AFTER' || echo 'false')
 DOWNLOAD_ONLY=false
 WEXIT=$(get_conf_var 'WEXIT' || echo 'false')
 CLEAN_ONLY=false
+
+if [ $COLOR == false ]; then
+	green=$white
+	red=$white
+	yellow=$white
+	bold=$white
+fi
 
 MIRROR=$(get_conf_var 'MIRROR' || \
 	awk -F/ 'match($3, /[a-z]/) {print $3}' /etc/installurl 2> /dev/null || \
