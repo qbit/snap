@@ -11,6 +11,8 @@ green="\\033[01;32m"
 bold="\\033[01;39m"
 white="\\033[0m"
 
+COLOR=true
+
 tmp_template="snap.XXXXXXXXXX"
 
 sets=""
@@ -303,6 +305,7 @@ if [ -e ~/.snaprc ]; then
 	CONF_FILE=~/.snaprc
 fi
 
+COLOR=$(get_conf_var 'COLOR' || echo 'true')
 SKIP_SIGN=false
 USE_BUILDINFO=true
 CPUS=$(sysctl -n hw.ncpu)
