@@ -30,6 +30,7 @@ snap options:
 
   -s force snap to use snapshots.
   -S do not check signatures.
+  -C only remove partial downloads.
   -c specify location of config file (default is ~/.snaprc)
   -e just extract sets in DST.
   -d just download sets to DST, verify and exit.
@@ -322,18 +323,21 @@ REBOOT=$(get_conf_var 'REBOOT' || echo 'false')
 AFTER=$(get_conf_var 'AFTER' || echo 'false')
 DOWNLOAD_ONLY=false
 WEXIT=$(get_conf_var 'WEXIT' || echo 'false')
+CLEAN_ONLY=false
 
 MIRROR=$(get_conf_var 'MIRROR' || \
 	awk -F/ 'match($3, /[a-z]/) {print $3}' /etc/installurl 2> /dev/null || \
 	echo "cdn.openbsd.org")
 
-while getopts "b:Bc:dD:ehiIkKm:M:nrRsSuUV:Wx" arg; do
+while getopts "b:BCc:dD:ehiIkKm:M:nrRsSuUV:Wx" arg; do
 	case $arg in
 		b)
 			INSTBOOT=$OPTARG
 			;;
 		B)
 			NO_KBACKUPS=true
+			;;
+		C)	CLEAN_ONLY=true
 			;;
 		c)
 			CONF_FILE=$OPTARG
@@ -407,6 +411,14 @@ while getopts "b:Bc:dD:ehiIkKm:M:nrRsSuUV:Wx" arg; do
 			exit 1
 	esac
 done
+
+if [ $CLEAN_ONLY == true ]; then
+	if [ $DST ]; then
+		rm -rf $DST/snap.*
+	else
+		rm -rf /tmp/snap.*
+	exit 0
+fi
 
 if [ $KERNEL_ONLY == true ] && [ $SETS_ONLY == true ]; then
 	echo 'The options -k and -K are mutually exclusive.'
