@@ -11,6 +11,8 @@ green="\\033[01;32m"
 bold="\\033[01;39m"
 white="\\033[0m"
 
+tmp_template="snap.XXXXXXXXXX"
+
 sets=""
 xsets=""
 bsds=""
@@ -305,7 +307,7 @@ SKIP_SIGN=false
 USE_BUILDINFO=true
 CPUS=$(sysctl -n hw.ncpu)
 INTERACTIVE=$(get_conf_var 'INTERACTIVE' || echo 'false')
-DST=$(get_conf_var 'DST' || mktemp -d -t snap.XXXXXXXXXX)
+DST=$(get_conf_var 'DST' || mktemp -d -t ${tmp_template})
 EXTRACT_ONLY=$(get_conf_var 'EXTRACT_ONLY' || echo 'false')
 KERNEL_ONLY=false
 SETS_ONLY=false
@@ -413,10 +415,19 @@ while getopts "b:BCc:dD:ehiIkKm:M:nrRsSuUV:Wx" arg; do
 done
 
 if [ $CLEAN_ONLY == true ]; then
-	if [ $DST ]; then
-		rm -rf $DST/snap.*
-	else
-		rm -rf /tmp/snap.*
+	qtmp=$(echo $tmp_template | sed 's/X/\?/g')
+
+	msg "${white}Cleaning: ${green}${DST}"
+	# Only remove files from DST, someone might have set it to /
+	rm -fv $DST/*.{tgz,rd,mp,sig}
+	rm -fv $DST/{BUILDINFO,bsd}
+
+	msg "${white}Purging: ${green}/tmp/${qtmp}"
+	for d in /tmp/${qtmp}; do
+		# Check if the dir exists before rm'ing
+		# - this prevents echoing of a ???? dir that doesn't exist
+		[ -d "${d}" ] && rm -rfv "$d"
+	done
 	exit 0
 fi
 
