@@ -32,7 +32,6 @@ usage() {
 
 snap options:
 
-  -s force snap to use snapshots.
   -S do not check signatures.
   -C only remove partial downloads.
   -c specify location of config file (default is ~/.snaprc)
@@ -319,7 +318,6 @@ MACHINE=$(machine)
 MERGE=$(get_conf_var 'MERGE' || echo 'false')
 NO_X11=$(get_conf_var 'NO_X11' || echo 'false')
 SETVER=$(uname -r | tr -d \.)
-VER="snapshots"
 CHK_INTEG=false
 CHK_UPDATE=$(get_conf_var 'CHK_UPDATE' || echo 'false')
 INS_UPDATE=$(get_conf_var 'INS_UPDATE' || echo 'false')
@@ -341,7 +339,7 @@ MIRROR=$(get_conf_var 'MIRROR' || \
 	awk -F/ 'match($3, /[a-z]/) {print $3}' /etc/installurl 2> /dev/null || \
 	echo "cdn.openbsd.org")
 
-while getopts "b:BCc:dD:ehiIkKm:M:nrRsSuUV:Wx" arg; do
+while getopts "b:BCc:dD:ehiIkKm:M:nrRSuUV:Wx" arg; do
 	case $arg in
 		b)
 			INSTBOOT=$OPTARG
@@ -396,9 +394,6 @@ while getopts "b:BCc:dD:ehiIkKm:M:nrRsSuUV:Wx" arg; do
 			;;
 		R)
 			REBOOT=true
-			;;
-		s)
-			VER='snapshots'
 			;;
 		S)
 			SKIP_SIGN=true
@@ -464,10 +459,10 @@ chmod -R g+rwx "$DST"
 
 case "${MIRROR}" in
 	http://* | ftp://* | https://*)
-		URL="${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
+		URL="${MIRROR}/pub/OpenBSD/snapshots/${MACHINE}"
 		;;
 	*)
-		URL="http://${MIRROR}/pub/OpenBSD/${VER}/${MACHINE}"
+		URL="http://${MIRROR}/pub/OpenBSD/snapshots/${MACHINE}"
 		;;
 esac
 
