@@ -236,7 +236,7 @@ check_integ() {
 }
 
 verisigs() {
-	KEY=/etc/signify/openbsd-${SETVER}-base.pub
+	KEY=${KEY:-/etc/signify/openbsd-${SETVER}-base.pub}
 	VALID=true
 
 	if [ -f "$KEY" ]; then
@@ -339,7 +339,7 @@ MIRROR=$(get_conf_var 'MIRROR' || \
 	awk -F/ 'match($3, /[a-z]/) {print $3}' /etc/installurl 2> /dev/null || \
 	echo "cdn.openbsd.org")
 
-while getopts "b:BCc:dD:ehiIkKm:M:nrRSuUV:Wx" arg; do
+while getopts "b:BCc:dD:ehiIkKm:M:nrRSs:uUV:Wx" arg; do
 	case $arg in
 		b)
 			INSTBOOT=$OPTARG
@@ -397,6 +397,9 @@ while getopts "b:BCc:dD:ehiIkKm:M:nrRSuUV:Wx" arg; do
 			;;
 		S)
 			SKIP_SIGN=true
+			;;
+		s)
+			KEY=$OPTARG
 			;;
 		u)
 			CHK_UPDATE=true
