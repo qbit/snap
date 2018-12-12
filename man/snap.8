@@ -29,6 +29,7 @@
 .Op Fl m Op machine
 .Op Fl M Op mirror
 .Op Fl V Op version
+.Op Fl s Op pubkey
 .Sh DESCRIPTION
 .Nm
 is a
@@ -98,6 +99,8 @@ If
 is omitted,
 .Nm
 will pull a copy of SHA256.sig from the GitHub page.
+.It Fl s Ar pubkey
+Signify pub key to do verification with.
 .It Fl i
 Run in interactive mode (has colors).
 .It Fl n

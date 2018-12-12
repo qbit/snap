@@ -43,6 +43,7 @@ snap options:
   -x do not extract x11 sets.
   -M specify a mirror to use (example: " -M cdn.openbsd.org")
   -I [full path to SHA256.sig file] verify integrity of snap.
+  -s [signify pub key] pub key to do verification with.
   -i interactive with colors.
   -n force using bsd.mp as bsd.
   -k only install kernels and exit.

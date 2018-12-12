@@ -14,6 +14,7 @@ SNAP(8) - System Manager's Manual
 \[**-m**&nbsp;\[machine]]
 \[**-M**&nbsp;\[mirror]]
 \[**-V**&nbsp;\[version]]
+\[**-s**&nbsp;\[pubkey]]
 
 # DESCRIPTION
 
@@ -106,6 +107,10 @@ The options are as follows:
 > is omitted,
 > **snap**
 > will pull a copy of SHA256.sig from the GitHub page.
+
+**-s** *pubkey*
+
+> Signify pub key to do verification with.
 
 **-i**
 
@@ -355,4 +360,4 @@ was released in September of 2012.
 was written by
 Aaron Bieber &lt;[aaron@bolddaemon.com](mailto:aaron@bolddaemon.com)&gt;.
 
-OpenBSD 6.3 - September 19, 2012
+OpenBSD 6.4 - September 19, 2012
