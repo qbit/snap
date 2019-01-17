@@ -52,6 +52,8 @@ The options are as follows:
 **-c** *config\_file*
 
 > Location of configuration file (default is
+> */etc/snap.conf*
+> or
 > *$HOME/.snaprc*
 > ).
 
@@ -61,7 +63,7 @@ The options are as follows:
 > The destination directory can be overwritten by the
 > **-D**
 > option, or by setting the DST line in
-> *$HOME/.snaprc*.
+> *config\_file*.
 
 **-d**
 
@@ -169,17 +171,23 @@ The options are as follows:
 
 > Contains timestamp of the previous snapshot.
 
-*$HOME/.snaprc*
+*/etc/snap.conf*
 
-> Contains configuration options.
+> Global configuration options.
 > See
 > *SNAPRC*
 > for more information on these options.
 
+*$HOME/.snaprc*
+
+> User specific configuration options.
+
 # SNAPRC
 
 **snap**
-supports the following configuration options via the
+supports the following configuration options via
+*/etc/snap.conf*
+or
 *$HOME/.snaprc*
 file:
 

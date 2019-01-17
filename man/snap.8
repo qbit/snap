@@ -60,6 +60,8 @@ Skip signature verification.
 This is not recommended!
 .It Fl c Ar config_file
 Location of configuration file (default is
+.Pa /etc/snap.conf
+or
 .Pa $HOME/.snaprc
 ).
 .It Fl e
@@ -67,7 +69,7 @@ Extract sets into destination directory and exit.
 The destination directory can be overwritten by the
 .Fl D
 option, or by setting the DST line in
-.Pa $HOME/.snaprc .
+.Pa config_file .
 .It Fl d
 Download sets to the destination directory, verify (
 .Fl S
@@ -139,15 +141,19 @@ Help.
 .Bl -tag -width "$HOME/.last_snap"
 .It Pa $HOME/.last_snap
 Contains timestamp of the previous snapshot.
-.It Pa $HOME/.snaprc
-Contains configuration options.
+.It Pa /etc/snap.conf
+Global configuration options.
 See
 .Sx SNAPRC
 for more information on these options.
+.It Pa $HOME/.snaprc
+User specific configuration options.
 .El
 .Sh SNAPRC
 .Nm
-supports the following configuration options via the
+supports the following configuration options via
+.Pa /etc/snap.conf
+or
 .Pa $HOME/.snaprc
 file:
 .Bl -tag -width Ds
